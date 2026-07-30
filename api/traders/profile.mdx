@@ -1,5 +1,5 @@
 ---
-title: "GET /v1/traders/:handle — Full Trader Profile"
+title: "Trader Profile — GET /v1/traders/:handle Full Detail"
 sidebarTitle: "Trader Profile"
 description: "GET /v1/traders/:handle returns a trader's full profile including Arcadia Score, equity curve, trade history, metrics, and vault capacity."
 ---
@@ -20,7 +20,7 @@ GET https://api.arcadia.trade/v1/traders/:handle
 
 ## Response
 
-Returns a `TraderProfile` object containing all `TraderListItem` fields plus the extended fields documented below.
+Returns a `TraderProfile` object.
 
 <ResponseField name="handle" type="string" required>
   The trader's unique display name on Arcadia.
@@ -46,24 +46,8 @@ Returns a `TraderProfile` object containing all `TraderListItem` fields plus the
   Statistical confidence in the score. One of `low`, `med`, or `high`.
 </ResponseField>
 
-<ResponseField name="capacity_usd" type="number" required>
-  Maximum investor capital this vault can accept, in USDC (6 decimal places).
-</ResponseField>
-
 <ResponseField name="aum" type="number" required>
   Current assets under management in USDC (6 decimal places).
-</ResponseField>
-
-<ResponseField name="return_30d" type="number" required>
-  30-day return percentage.
-</ResponseField>
-
-<ResponseField name="max_dd" type="number" required>
-  Maximum drawdown over full vault history, as a percentage.
-</ResponseField>
-
-<ResponseField name="sortino" type="number" required>
-  Sortino ratio over the trailing 90 days.
 </ResponseField>
 
 <ResponseField name="deposits_open" type="boolean" required>
@@ -76,10 +60,6 @@ Returns a `TraderProfile` object containing all `TraderListItem` fields plus the
 
 <ResponseField name="trader_self_funded" type="number" required>
   Trader's own capital currently in the vault, in USDC (6 decimal places).
-</ResponseField>
-
-<ResponseField name="bio" type="string">
-  Optional free-text bio provided by the trader. May be `null` if not set.
 </ResponseField>
 
 <ResponseField name="investors_count" type="number" required>
@@ -96,6 +76,18 @@ Returns a `TraderProfile` object containing all `TraderListItem` fields plus the
 
 <ResponseField name="max_leverage" type="number" required>
   Maximum leverage used in any single trade over the vault's full history.
+</ResponseField>
+
+<ResponseField name="bio" type="string">
+  Optional free-text bio provided by the trader. Omitted when not set.
+</ResponseField>
+
+<ResponseField name="agent" type="string">
+  Optional identifier for the automated agent or bot framework operating this vault, if any. Omitted when the trader is human-operated.
+</ResponseField>
+
+<ResponseField name="style" type="string">
+  Optional free-text style descriptor provided by the trader. Distinct from `style_tags`, which are system-assigned labels.
 </ResponseField>
 
 <ResponseField name="ci" type="object" required>
@@ -221,7 +213,7 @@ Returns a `TraderProfile` object containing all `TraderListItem` fields plus the
       Unix timestamp (seconds) when the position was closed.
     </ResponseField>
     <ResponseField name="sig" type="string">
-      Optional Solana transaction signature for the closing instruction. May be `null` for older records.
+      Optional Solana transaction signature for the closing instruction. Omitted for older records.
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -241,14 +233,10 @@ curl https://api.arcadia.trade/v1/traders/apex_trader
   "handle": "apex_trader",
   "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
   "profile": "3Fg9NqTzPpRh8kXsWmYdEvUv4LcSZqNb1oDrF7KjHmVp",
-  "score": 912,
+  "score": 962,
   "tier": "Apex",
   "confidence": "high",
-  "capacity_usd": 2000000000000,
   "aum": 847320150000,
-  "return_30d": 18.43,
-  "max_dd": 6.21,
-  "sortino": 4.87,
   "deposits_open": true,
   "style_tags": ["trend-following", "momentum"],
   "trader_self_funded": 250000000000,
@@ -258,9 +246,9 @@ curl https://api.arcadia.trade/v1/traders/apex_trader
   "trade_count": 1043,
   "max_leverage": 10,
   "ci": {
-    "lo": 887,
-    "point": 912,
-    "hi": 934
+    "lo": 951,
+    "point": 962,
+    "hi": 971
   },
   "capacity": {
     "total": 2000000000000,

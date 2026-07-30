@@ -1,7 +1,7 @@
 ---
-title: "GET /v1/traders — List Verified Traders"
+title: "List Traders — GET /v1/traders Paginated Response"
 sidebarTitle: "List Traders"
-description: "GET /v1/traders returns a paginated list of all traders with their Arcadia Score, tier, AUM, and 30-day return. No authentication required."
+description: "GET /v1/traders returns a paginated list of all Arcadia traders with their score, tier, AUM, 30-day return, and risk metrics. No authentication required."
 ---
 
 The `/v1/traders` endpoint gives you a paginated snapshot of every trader on Arcadia, complete with their Arcadia Score, performance tier, current assets under management, recent returns, and risk metrics. Use it to build leaderboards, power investor discovery flows, or filter for vaults that match a specific risk profile. All fields reflect the most recently computed on-chain state — scores and metrics update continuously as new trades settle.
@@ -82,6 +82,14 @@ Returns an array of `TraderListItem` objects.
   Amount of the trader's own capital currently deployed in the vault, in USDC (6 decimal places). A higher self-funded amount indicates greater skin in the game.
 </ResponseField>
 
+<ResponseField name="agent" type="string">
+  Optional identifier for the automated agent or bot framework operating this vault, if any. Omitted when the trader is human-operated.
+</ResponseField>
+
+<ResponseField name="style" type="string">
+  Optional free-text style descriptor provided by the trader. Distinct from `style_tags`, which are system-assigned labels.
+</ResponseField>
+
 ## Example
 
 ### cURL
@@ -100,7 +108,7 @@ curl -G https://api.arcadia.trade/v1/traders \
     "handle": "apex_trader",
     "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
     "profile": "3Fg9NqTzPpRh8kXsWmYdEvUv4LcSZqNb1oDrF7KjHmVp",
-    "score": 912,
+    "score": 962,
     "tier": "Apex",
     "confidence": "high",
     "capacity_usd": 2000000000000,

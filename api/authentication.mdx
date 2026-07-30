@@ -1,7 +1,7 @@
 ---
-title: "API Authentication: SIWS and API Keys"
+title: "Arcadia API Authentication: SIWS, Privy, and API Keys"
 sidebarTitle: "Authentication"
-description: "Authenticate Arcadia API calls using a JWT from Sign-In With Solana, or an API key for machine-to-machine score lookups. Public endpoints require no auth."
+description: "Authenticate Arcadia API requests with a Bearer JWT via Sign-In With Solana or Privy, or use an API key for server-side score lookups."
 ---
 
 The Arcadia API supports three authentication modes, each designed for a different access pattern. Public endpoints — trader scores, vault data, leaderboards, and prices — require no credentials at all. Endpoints that read or modify user-specific data require a short-lived Bearer JWT obtained by signing a challenge message with your Solana wallet (Sign-In With Solana) or via Privy. A separate API key mechanism is available for server-side applications that need to look up trader scores without user context.
@@ -33,7 +33,7 @@ The following endpoints are open and require no `Authorization` header:
 - `GET /v1/leaderboard`
 - `GET /v1/prices`
 - `POST /v1/auth/challenge`, `POST /v1/auth/verify`, `POST /v1/auth/privy`
-- `POST /v1/waitlist`
+- `POST /v1/waitlist`, `GET /v1/waitlist/position`, `GET /v1/waitlist/me`
 
 Simply omit the `Authorization` header when calling these endpoints.
 
@@ -102,7 +102,6 @@ Nonce: a3f8c2d1e74b9056
 Sign the UTF-8 encoded message bytes with your wallet's Ed25519 private key and base58-encode the resulting 64-byte signature.
 
 ```typescript
-import { sign } from "@solana/web3.js";
 import bs58 from "bs58";
 
 const message = `Arcadia wants you to sign in with your Solana account:\n${pubkey}\n\nNonce: ${nonce}`;

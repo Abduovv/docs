@@ -54,6 +54,26 @@ Arcadia stores all state in PDAs. You derive each account address deterministica
 
 The program emits structured events that your indexer or UI can subscribe to via Solana's program log stream. Each event is anchor-serialised and prefixed with an 8-byte discriminator.
 
+<Accordion title="ProfileInitialized">
+  Emitted when a trader creates a new vault by calling `initialize_profile`.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `profile` | `Pubkey` | The newly created `TraderProfile` PDA |
+  | `trader` | `Pubkey` | The trader's wallet that owns the vault |
+  | `score_tier` | `u8` | The trader's score tier at initialisation time |
+  | `max_leverage` | `u8` | Maximum leverage allowed in this vault |
+</Accordion>
+
+<Accordion title="InvestorInitialized">
+  Emitted when an investor's `InvestorAccount` PDA is created for the first time.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `account` | `Pubkey` | The newly created `InvestorAccount` PDA |
+  | `owner` | `Pubkey` | The investor's wallet |
+</Accordion>
+
 <Accordion title="Deposited">
   Emitted when an investor or trader successfully deposits USDC into a vault.
 
@@ -123,6 +143,16 @@ The program emits structured events that your indexer or UI can subscribe to via
   | `amount` | `u64` | USDC transferred to the trader (6 decimals) |
 </Accordion>
 
+<Accordion title="ExecutionFunded">
+  Emitted when an execution account is funded, enabling the trader's agent to submit trades on-chain.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `profile` | `Pubkey` | The vault whose execution account was funded |
+  | `trader` | `Pubkey` | The trader's wallet |
+  | `amount` | `u64` | SOL amount funded (in lamports) |
+</Accordion>
+
 ---
 
 ## Error Codes
@@ -131,16 +161,21 @@ When a transaction fails, the program returns one of the following custom errors
 
 | Error | Meaning | How to handle |
 |---|---|---|
+| `Unauthorized` | The signer does not have permission to perform this action | Ensure the correct wallet is connected and that it is the vault owner for trader-only instructions. |
 | `VaultNotActive` | The vault is paused or closed | Inform the user the vault is not currently accepting activity. Check vault status before submitting. |
 | `ZeroAmount` | A deposit or withdrawal of 0 USDC was submitted | Validate that the amount is greater than zero before building the transaction. |
 | `InsufficientFunds` | The vault does not have enough USDC to cover the withdrawal | The vault may be fully deployed in open positions. Ask the user to try again after positions settle. |
+| `InvalidLeverage` | The leverage value supplied is not valid (e.g. zero or below the minimum) | Validate leverage is within the allowed range before building the transaction. |
 | `LeverageTooHigh` | The trade would exceed the vault's configured `max_leverage` | Reduce position size or leverage. Display the vault's current leverage limit to the user. |
 | `NotionalTooLarge` | A single trade exceeds 20% of vault AUM | Split the trade into smaller orders or wait for AUM to grow. |
+| `CapacityNotSet` | A deposit was attempted before the trader configured a capacity ceiling | The trader must set a `capacityCapUsd` on their vault before investors can deposit. |
 | `CapacityExceeded` | The deposit would push vault AUM above its capacity ceiling | Inform the investor the vault is full. They can join a waitlist or try another vault. |
 | `DustDeposit` | The deposit amount is below the vault's minimum | Show the minimum deposit amount from the `TraderProfile` account and prompt the user to deposit more. |
-| `NoticeNotElapsed` | `process_withdraw` was called before `ready_ts` | Display `ready_ts` to the user as a countdown timer. Disable the "Withdraw" button until the timestamp passes. |
 | `InsufficientShares` | The investor does not have enough shares to redeem | Validate share balance from the `InvestorPosition` account before building the transaction. |
+| `NoticeNotElapsed` | `process_withdraw` was called before `ready_ts` | Display `ready_ts` to the user as a countdown timer. Disable the "Withdraw" button until the timestamp passes. |
 | `InsufficientClaimable` | The trader called `trader_withdraw_profit` but has no accrued profit | Disable the claim button until a `Settled` event with a non-zero `trader_fee` has been emitted. |
+| `MathOverflow` | An arithmetic operation overflowed | This indicates an unexpected program state. Report the transaction signature to the Arcadia team. |
+| `TokenConservationFailed` | Post-instruction token balances do not satisfy conservation checks | This is a safety invariant violation. Report the transaction signature to the Arcadia team. |
 
 ---
 
@@ -152,41 +187,67 @@ The Arcadia TypeScript SDK (`arcadia-sdk`) exposes utilities for deriving and fe
 
 ```typescript
 import { PublicKey } from "@solana/web3.js";
-import { findTraderProfile, findInvestorAccount, findInvestorPosition } from "arcadia-sdk";
-
-const PROGRAM_ID = new PublicKey("FPoAMRkM3kXfuvFn1iC2cM8B554KfnaPjibjLH31CHtd");
+import {
+  findTraderProfile,
+  findInvestorAccount,
+  findInvestorPosition,
+} from "arcadia-sdk";
 
 // Derive a trader's vault PDA
 const traderKey = new PublicKey("7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU");
-const [traderProfile] = findTraderProfile(traderKey, PROGRAM_ID);
+const [traderProfile] = findTraderProfile(traderKey);
 
 // Derive an investor's account PDA
 const investorKey = new PublicKey("9mZoW3rPqX1sBkL2vCnTy8dFhGjKuRe4iAw6sNpYx5M");
-const [investorAccount] = findInvestorAccount(investorKey, PROGRAM_ID);
+const [investorAccount] = findInvestorAccount(investorKey);
 
 // Derive a specific investor × vault position PDA
-const [investorPosition] = findInvestorPosition(investorKey, traderProfile, PROGRAM_ID);
+const [investorPosition] = findInvestorPosition(investorKey, traderProfile);
 ```
 
 ### Fetch account data
 
 ```typescript
-import { Connection } from "@solana/web3.js";
-import { fetchTraderProfile, fetchInvestorAccount } from "arcadia-sdk";
+import { Connection, PublicKey } from "@solana/web3.js";
+import {
+  fetchTraderProfile,
+  fetchInvestorAccount,
+  fetchInvestorPosition,
+} from "arcadia-sdk";
 
 const connection = new Connection("https://api.devnet.solana.com");
 
+const traderKey = new PublicKey("7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU");
+const investorKey = new PublicKey("9mZoW3rPqX1sBkL2vCnTy8dFhGjKuRe4iAw6sNpYx5M");
+
 // Fetch and decode a TraderProfile account
 const profile = await fetchTraderProfile(connection, traderKey);
-console.log("Vault AUM:", profile.aum);
-console.log("NAV per share:", profile.navPerShare);
-console.log("High-water mark:", profile.highWaterMark);
+if (profile) {
+  console.log("Total shares:", profile.totalShares);
+  console.log("HWM per share:", profile.hwmPerShare);
+  console.log("Trader claimable:", profile.traderClaimable);
+  console.log("Max leverage:", profile.maxLeverage);
+  console.log("Vault status:", profile.status);
+}
 
 // Fetch and decode an InvestorAccount
 const account = await fetchInvestorAccount(connection, investorKey);
-console.log("Total positions:", account.positionCount);
+if (account) {
+  console.log("Position count:", account.positionCount);
+  console.log("Total deposited USD:", account.totalDepositedUsd);
+}
+
+// Fetch and decode a specific InvestorPosition
+const [traderProfilePda] = findTraderProfile(traderKey);
+const position = await fetchInvestorPosition(connection, investorKey, traderProfilePda);
+if (position) {
+  console.log("Shares held:", position.shares);
+  console.log("Cost basis USD:", position.costBasisUsd);
+  console.log("Pending withdraw shares:", position.pendingWithdrawShares);
+  console.log("Withdraw ready at:", position.withdrawReadyTs);
+}
 ```
 
 <Tip>
-  All `find*` helpers return a tuple of `[PublicKey, bump]` — the same pattern as `PublicKey.findProgramAddressSync`. Cache the derived address; re-deriving on every render is unnecessary but harmless.
+  All `find*` helpers return a tuple of `[PublicKey, bump]` — the same pattern as `PublicKey.findProgramAddressSync`. The program ID is baked into the SDK — do not pass it as an argument. Cache the derived address; re-deriving on every render is unnecessary but harmless.
 </Tip>

@@ -1,7 +1,7 @@
 ---
-title: "GET /v1/investors/:wallet/flows"
+title: "Investor Flow History — GET /v1/investors/:wallet/flows"
 sidebarTitle: "Flows"
-description: "GET /v1/investors/:wallet/flows returns your full deposit and withdrawal history across all Arcadia vaults. Supports pagination via the limit parameter."
+description: "Retrieve your full deposit and withdrawal history across all Arcadia vaults, including NAV per share at settlement. Requires Bearer JWT."
 ---
 
 The flows endpoint returns a chronological record of every capital movement tied to your investor account — both deposits into vaults and withdrawals from them. Each event captures the exact NAV per share at the time of execution, the number of shares exchanged, and the USD amount, giving you a complete audit trail for tax reporting, reconciliation, or performance attribution. Events are returned newest-first by default.
@@ -121,3 +121,9 @@ curl -X GET "https://api.arcadia.trade/v1/investors/7xKXtg2CW87d97TXJSDpbD5jBkhe
   }
 ]
 ```
+
+---
+
+## Related: Notifications
+
+`GET /v1/investors/:wallet/notifications` provides a real-time feed of account-level events — deposit confirmations, withdrawal readiness alerts, and vault status changes. It shares the same Bearer JWT authentication requirement as this endpoint. Refer to the Notifications reference for full details.

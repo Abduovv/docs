@@ -1,10 +1,10 @@
 ---
-title: "GET /v1/prices — Live Market Prices"
+title: "GET /v1/prices — Live Market Prices for All Instruments"
 sidebarTitle: "Prices"
-description: "GET /v1/prices returns the current Pyth price feed cache for all Arcadia markets including XAU/USD, EUR/USD, and other supported instruments."
+description: "Retrieve real-time prices for all Arcadia markets, including 24-hour change, high, low, and notional volume. No authentication required."
 ---
 
-The prices endpoint serves Arcadia's real-time market price cache, sourced from Pyth Network oracle feeds and refreshed on every slot. Each entry covers a single tradeable instrument and includes the current mid-price, 24-hour change in absolute and percentage terms, intraday high and low, and 24-hour volume. You can use this endpoint to power price tickers, display market context alongside vault trade history, or pre-validate entry prices before submitting orders.
+The prices endpoint serves Arcadia's real-time market price feed, refreshed on every slot. Each entry covers a single tradeable instrument and includes the current mid-price, 24-hour change in absolute and percentage terms, intraday high and low, and 24-hour volume. You can use this endpoint to power price tickers, display market context alongside vault trade history, or pre-validate entry prices before submitting orders.
 
 ## Request
 
@@ -27,8 +27,7 @@ The response is an array of `PriceData` objects — one per supported market. Th
 </ResponseField>
 
 <ResponseField name="price" type="number">
-  The current mid-price as reported by the Pyth oracle feed at the time of the
-  last cache refresh.
+  The current mid-price for this market at the time of the last feed refresh.
 </ResponseField>
 
 <ResponseField name="change_24h" type="number">
@@ -55,8 +54,8 @@ The response is an array of `PriceData` objects — one per supported market. Th
 </ResponseField>
 
 <ResponseField name="ts" type="number">
-  Unix timestamp (seconds) of the most recent Pyth price update reflected in
-  this entry.
+  Unix timestamp (seconds) of the most recent price update reflected in this
+  entry.
 </ResponseField>
 
 ---

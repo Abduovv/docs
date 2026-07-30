@@ -1,5 +1,5 @@
 ---
-title: "GET /v1/traders/:handle/score-history"
+title: "Score History — GET /v1/traders/:handle/score-history"
 sidebarTitle: "Score History"
 description: "GET /v1/traders/:handle/score-history returns historical Arcadia Score snapshots. Use it to plot score trends and evaluate consistency over time."
 ---
@@ -26,7 +26,7 @@ GET https://api.arcadia.trade/v1/traders/:handle/score-history
 
 ## Response
 
-Returns an array of score snapshot objects, ordered from oldest to newest.
+Returns an array of `ScorePoint` objects, ordered from oldest to newest.
 
 <ResponseField name="ts" type="number" required>
   Unix timestamp (seconds) for this snapshot, snapped to midnight UTC on the day the score was recorded.
@@ -55,10 +55,20 @@ curl -G https://api.arcadia.trade/v1/traders/apex_trader/score-history \
   { "ts": 1716249600, "score": 871 },
   { "ts": 1716854400, "score": 883 },
   { "ts": 1717459200, "score": 899 },
-  { "ts": 1718064000, "score": 912 }
+  { "ts": 1718064000, "score": 962 }
 ]
 ```
 
 <Tip>
   A rising score trend combined with a `confidence` of `"high"` (visible on the trader's profile) is the most reliable signal of a consistently improving trader. A sudden score spike on `"low"` confidence often means the trader has few trades recorded — treat it with caution until more history accumulates.
 </Tip>
+
+## Companion Endpoint: Daily PnL History
+
+Score history tracks the evolution of a trader's Arcadia Score over time. For raw daily profit-and-loss data, use the companion endpoint:
+
+```
+GET https://api.arcadia.trade/v1/traders/:handle/pnl-history
+```
+
+This endpoint returns an array of `DailyPnL` objects, each with a `date` (ISO 8601 date string, e.g. `"2024-06-03"`) and a `pnl` field (that day's net profit or loss in USDC, 6 decimal places). Use `pnl-history` to build bar charts of daily returns or calculate rolling drawdown windows independently of the Arcadia Score.

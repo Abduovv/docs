@@ -1,7 +1,7 @@
 ---
 title: "Arcadia Vaults: Smart-Contract Capital Pools"
 sidebarTitle: "Vaults"
-description: "Each Arcadia trader has one non-custodial vault on Solana. Investors deposit USDC, receive shares, and exit proportionally — with no direct trader access to funds."
+description: "USDC vaults on Solana, one per Arcadia trader. Investors get NAV-priced shares and exit proportionally — no direct trader access to investor funds."
 ---
 
 Every trader on Arcadia operates through a single on-chain vault — a smart contract deployed on Solana that holds all capital, tracks performance, and enforces the rules of the protocol. The vault is the unit of trust between a trader and their investors: it records every deposit, trade settlement, and withdrawal in a verifiable, tamper-proof ledger. Investors do not send funds to a trader's wallet; they deposit into the vault contract, which issues shares in return. The trader never has direct access to investor USDC — they only hold trading permissions.

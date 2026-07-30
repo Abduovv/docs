@@ -30,7 +30,7 @@ Your trading edge deserves capital to match it. Arcadia turns your on-chain hist
     Before any investor capital can enter your vault, you need to create your on-chain trader profile and seed your vault with your own funds.
 
     1. From your dashboard, click **Initialize Vault**.
-    2. Review the vault creation transaction — this deploys your personal vault program account on Solana (Program ID: `FPoAMRkM3kXfuvFn1iC2cM8B554KfnaPjibjLH31CHtd` on devnet).
+    2. Review the vault creation transaction — this deploys your personal vault program account on Solana.
     3. Approve the transaction in your wallet. A small SOL amount is required for account rent.
     4. **Self-fund your vault** by depositing USDC into your own vault. This is a hard requirement before investor deposits are permitted.
 
@@ -38,7 +38,7 @@ Your trading edge deserves capital to match it. Arcadia turns your on-chain hist
       You must self-fund your vault before investors can allocate capital to you. This requirement aligns your interests with your investors — you have real skin in the game before they do.
     </Note>
 
-    Your vault is initialized with `deposits_open = false`. You control when you open your vault to investors after you've established a score.
+    Your vault starts with deposits closed. You control when you open your vault to investors after you've established a score.
   </Step>
 
   <Step title="Start trading">
@@ -58,7 +58,7 @@ Your trading edge deserves capital to match it. Arcadia turns your on-chain hist
   <Step title="Build your score and unlock investor capital">
     Your Arcadia Score updates continuously as you trade. As your score crosses tier thresholds, your vault's investor capacity increases and your profit share rate rises.
 
-    Once you're satisfied with your score, open your vault to investors from the **Vault Settings** panel by toggling `deposits_open` to `true`. Investors browsing the leaderboard will now be able to allocate USDC to your vault.
+    Once you're satisfied with your score, open your vault to investors from the **Vault Settings** panel by enabling deposits. Investors browsing the leaderboard will now be able to allocate USDC to your vault.
 
     Your profit share is automatically calculated on-chain at settlement — no manual claims or off-chain agreements required.
   </Step>

@@ -94,7 +94,7 @@ The SIWS flow has four steps: request a nonce, sign a canonical message, verify 
     }
     ```
 
-    The returned JWT is signed with HS256, has a default expiry of **24 hours**, and its `sub` claim is set to your base58 wallet public key.
+    The returned JWT expires after **24 hours**. Its `sub` claim is set to your base58 wallet public key.
   </Step>
 
   <Step title="Attach the JWT to API requests">

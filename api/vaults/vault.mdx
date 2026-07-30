@@ -1,7 +1,7 @@
 ---
-title: "GET /v1/vaults/:profile — Vault State"
+title: "Vault State — GET /v1/vaults/:profile Full Snapshot"
 sidebarTitle: "Vault State"
-description: "GET /v1/vaults/:profile returns a trader vault's current NAV, AUM, shares, high-water mark, fee rates, and deposit status. No authentication required."
+description: "Retrieve a trader vault's current NAV per share, AUM, share supply, high-water mark, fee rates, and deposit status. No authentication required."
 ---
 
 The vault state endpoint exposes the complete on-chain snapshot of a single trader vault. You can use it to display live NAV, monitor assets under management, check whether deposits are currently open, inspect the fee structure, and verify the vault's Arcadia score tier — all without authentication. Poll this endpoint to power vault detail pages, capacity gauges, or automated deposit eligibility checks.
@@ -12,9 +12,9 @@ The vault state endpoint exposes the complete on-chain snapshot of a single trad
   `11.25` means each vault share is currently worth $11.25 USDC.
 
   **Performance fee in basis points:** `perf_fee_bps` is expressed in basis
-  points where 100 bps = 1%. A value of `1500` means the trader earns a 15%
-  performance fee on profits above the high-water mark. This fee is only charged
-  on gains — it is never deducted from your principal.
+  points where 100 bps = 1%. For example, a value of `1000` means a 10%
+  performance fee; `1500` means 15%. This fee is only charged on gains above
+  the high-water mark — it is never deducted from your principal.
 </Note>
 
 ## Request
@@ -90,8 +90,8 @@ The vault state endpoint exposes the complete on-chain snapshot of a single trad
 </ResponseField>
 
 <ResponseField name="perf_fee_bps" type="number">
-  Performance fee rate in basis points (100 bps = 1%). Charged on profits
-  above the high-water mark only.
+  Performance fee rate in basis points (100 bps = 1%, e.g. `1000` = 10%).
+  Charged on profits above the high-water mark only.
 </ResponseField>
 
 <ResponseField name="mgmt_fee_bps" type="number">
@@ -101,8 +101,8 @@ The vault state endpoint exposes the complete on-chain snapshot of a single trad
 
 <ResponseField name="score_tier" type="string">
   The Arcadia score tier assigned to this vault based on its verified
-  performance history. Examples: `"Bronze"`, `"Silver"`, `"Gold"`,
-  `"Platinum"`.
+  performance history. One of: `"Verified"`, `"Established"`, `"Advanced"`,
+  `"Elite"`, `"Apex"`.
 </ResponseField>
 
 ---
@@ -132,6 +132,6 @@ curl -X GET "https://api.arcadia.trade/v1/vaults/BzHQpBRU5e2ZVPxq8dCRcHqMdVoP5kR
   "vault_token": "GvFT9wQ8pZnEcx3PL2Xkm6DaJ5YbNhRuCfWoMsT1VpAd",
   "perf_fee_bps": 1500,
   "mgmt_fee_bps": 200,
-  "score_tier": "Gold"
+  "score_tier": "Elite"
 }
 ```

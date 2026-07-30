@@ -1,5 +1,5 @@
 ---
-title: "Arcadia REST API: Overview and Quick Reference"
+title: "Arcadia REST API: Endpoints, Auth, and Numeric Conventions"
 sidebarTitle: "Overview"
 description: "The Arcadia API gives programmatic access to trader scores, vault data, leaderboards, and investor portfolios. All endpoints return JSON over HTTPS."
 ---
@@ -66,6 +66,8 @@ Every request must be made over HTTPS. HTTP requests are not supported.
 | `GET` | `/v1/prices` | None | Current asset prices used by the protocol |
 | `GET` | `/v1/score?wallet=<base58>` | `x-api-key` | Machine-to-machine score lookup by wallet |
 | `POST` | `/v1/waitlist` | None | Join the Arcadia waitlist |
+| `GET` | `/v1/waitlist/position` | None | Check your position in the waitlist queue |
+| `GET` | `/v1/waitlist/me` | None | Retrieve your own waitlist entry details |
 
 ---
 

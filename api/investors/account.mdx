@@ -1,7 +1,7 @@
 ---
-title: "GET /v1/investors/:wallet/account"
+title: "Investor Account — GET /v1/investors/:wallet/account"
 sidebarTitle: "Account"
-description: "GET /v1/investors/:wallet/account returns your investor account and all vault positions. Requires a valid Bearer JWT matching the wallet address."
+description: "Retrieve your Arcadia investor account metadata and all current vault positions. Requires a Bearer JWT matching the wallet in the path."
 ---
 
 The account endpoint is your primary view into your Arcadia investor state. It returns the on-chain account metadata tied to your wallet — including your account public key and creation timestamp — alongside a full list of every vault position you currently hold. Each position records your share balance, any pending withdrawal, and the cost basis used to calculate your realized and unrealized performance.

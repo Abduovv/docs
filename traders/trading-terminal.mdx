@@ -1,5 +1,5 @@
 ---
-title: "Trading on Arcadia: Terminal and Markets"
+title: "Trading on Arcadia: Terminal, Markets, and Risk Rules"
 sidebarTitle: "Trading Terminal"
 description: "Use the Arcadia trading terminal to open and close leveraged perp positions. All trades are recorded on-chain and factor into your Arcadia Score."
 ---
@@ -20,10 +20,6 @@ Arcadia integrates with **FlashTrade** to offer leveraged perpetual positions on
 | GBP/USD | British Pound vs. US Dollar |
 | USD/JPY | US Dollar vs. Japanese Yen |
 
-### Solana Perp DEXs
-
-In addition to FlashTrade markets, the terminal supports perpetual positions routed through Solana-native DEXs including **Drift** and **Phoenix**. Additional venues may be added as the protocol expands.
-
 ## How Trades Affect Your Score
 
 Every time you close a trade, the following data points are written on-chain and read by the scoring engine on its next hourly run:
@@ -40,7 +36,7 @@ The scoring engine aggregates these events to calculate metrics including win ra
 
 <Steps>
   <Step title="Select a market from the terminal">
-    Choose a market from the left-hand market panel. FlashTrade forex/commodity pairs and Solana DEX perp markets are listed in separate tabs.
+    Choose a market from the left-hand market panel. All available FlashTrade forex and commodity pairs are listed there.
   </Step>
   <Step title="Choose your direction">
     Select **Long** if you expect the price to rise, or **Short** if you expect it to fall.
@@ -52,7 +48,7 @@ The scoring engine aggregates these events to calculate metrics including win ra
     Before submitting, confirm the entry price estimate, opening fee, and liquidation price shown in the order summary panel.
   </Step>
   <Step title="Submit the trade">
-    Click **Open Position**. The protocol's execution wallet opens the position on your behalf. All trades are routed through the execution wallet — a protocol-managed ephemeral keypair — so your personal wallet is never exposed to individual position risk.
+    Click **Open Position**. The protocol opens the position on your behalf. Your personal wallet signs only the vault-level instructions — it is never exposed to the individual position on the underlying venue.
   </Step>
   <Step title="Monitor your open positions">
     Your active positions appear in the **Positions** tab of the terminal dashboard. You can see unrealised PnL, current leverage, and distance to liquidation in real time.
@@ -73,7 +69,7 @@ These constraints cannot be overridden from the terminal and apply to every trad
 
 ## Closing a Trade
 
-Navigate to the **Positions** tab, find the position you want to close, and click **Close**. The execution wallet submits the closing transaction, PnL is settled to the vault, and the trade record is written on-chain. The scoring engine will include this trade in the next hourly update.
+Navigate to the **Positions** tab, find the position you want to close, and click **Close**. The protocol submits the closing transaction, PnL is settled to the vault, and the trade record is written on-chain. The scoring engine will include this trade in the next hourly update.
 
 <Tip>
   Consistent, risk-managed trades matter more for your Arcadia Score than a single large win. The Guard Factor actively penalises a liquidation rate above 5% — protecting your score means protecting your positions.

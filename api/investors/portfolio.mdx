@@ -1,7 +1,7 @@
 ---
-title: "GET /v1/investors/:wallet/portfolio"
+title: "Investor Portfolio — GET /v1/investors/:wallet/portfolio"
 sidebarTitle: "Portfolio"
-description: "GET /v1/investors/:wallet/portfolio returns current vault positions with live value, cost basis, PnL, and ROI for each trader you've backed."
+description: "Retrieve live vault positions with current USD value, cost basis, PnL, and ROI for every vault you hold shares in. Requires Bearer JWT."
 ---
 
 The portfolio endpoint gives you a real-time financial snapshot of every active vault position you hold. Unlike the raw account endpoint, each item here is enriched with the vault's current net asset value so you can see your position's live USD value, the profit or loss relative to your cost basis, and your percentage return — all in a single request. Use this endpoint to build portfolio dashboards, calculate exposure, or surface performance data to your users.
