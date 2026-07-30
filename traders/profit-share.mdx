@@ -1,0 +1,60 @@
+---
+title: "How Trader Profit Share Works on Arcadia"
+sidebarTitle: "Profit Share"
+description: "Traders earn a performance fee when vault NAV exceeds the high-water mark. Your tier determines the split. Learn how to view and withdraw your claimable earnings."
+---
+
+Arcadia aligns trader and investor incentives through a tier-based performance fee model. You earn a profit share only when your vault's net asset value (NAV) rises above its high-water mark — meaning you are rewarded for delivering real, new profits, not for recovering ground already lost. The higher your Arcadia Score climbs, the greater the percentage of those profits you keep, giving you a direct financial incentive to trade consistently and build your reputation on-chain.
+
+## How Profit Share Is Calculated
+
+Profit share is triggered whenever the vault's current NAV exceeds its **high-water mark (HWM)** — the highest NAV the vault has previously reached at any prior settlement.
+
+When a settlement runs, the profit above the HWM is split three ways:
+
+1. **Trader profit share** — your percentage, determined by your current score tier (see table below)
+2. **Platform fee** — a small percentage retained by the Arcadia protocol
+3. **Remainder** — stays in the vault and accrues to investors proportional to their share holdings
+
+After each settlement, the HWM is updated to the new NAV, ensuring that investors are never charged a performance fee twice on the same profits. If the vault subsequently drawdowns and recovers, no performance fee accrues until the vault surpasses the previous HWM.
+
+## Tier-Based Profit Share
+
+Your profit share percentage is determined entirely by your Arcadia Score at the time of settlement. Scores update hourly — if you cross a tier threshold between settlements, your new rate applies to the next settlement.
+
+| Tier | Score | Profit Share |
+|---|---|---|
+| Verified | 100+ | 20% |
+| Established | 250+ | 25% |
+| Advanced | 500+ | 30% |
+| Elite | 750+ | 35% |
+| Apex | 950+ | 40% |
+
+## Viewing Your Claimable Earnings
+
+Navigate to **Dashboard → Payouts** to see your current claimable USDC balance. This balance accumulates across settlements and remains on-chain until you choose to withdraw it. You can claim at any time — there is no expiry on earned profit share.
+
+## Withdrawing Your Profit Share
+
+<Steps>
+  <Step title="Navigate to Dashboard → Payouts">
+    Open your trader dashboard and click the **Payouts** tab in the left-hand navigation panel.
+  </Step>
+  <Step title="Review your claimable balance">
+    The Payouts panel displays your total claimable USDC, a breakdown of settlements contributing to that balance, and the dates they occurred.
+  </Step>
+  <Step title="Click Withdraw">
+    Click the **Withdraw** button to initiate the claim. Your wallet will prompt you to sign a `trader_withdraw_profit` transaction. This is a standard Solana transaction and requires a small amount of SOL for the transaction fee.
+  </Step>
+  <Step title="USDC arrives in your wallet">
+    Once the transaction confirms on-chain, your claimable USDC is transferred directly to your connected wallet. The payout balance in the dashboard resets to zero.
+  </Step>
+</Steps>
+
+<Note>
+  Profit share accrues **only on new profits above the high-water mark**. If your vault is in a drawdown and recovering toward a previous HWM, no performance fee is charged during that recovery period — investors are made whole first. Profit share resumes only once the vault sets a new all-time-high NAV.
+</Note>
+
+<Tip>
+  The most powerful lever for increasing your absolute earnings is growing your vault's AUM. A higher score tier earns a larger percentage, but a larger asset base amplifies the impact of every tier increase. Focus on building a consistent track record to attract investor capital — the combination of high score and high AUM is where earnings compound most quickly.
+</Tip>

@@ -1,0 +1,170 @@
+---
+title: "GET /v1/leaderboard — Top Traders by Score and Return"
+sidebarTitle: "Leaderboard"
+description: "GET /v1/leaderboard returns the top 100 traders by Arcadia Score and by 30-day return. Use it to discover and compare the best-performing verified traders."
+---
+
+The leaderboard endpoint is the fastest way to surface the best-performing traders on Arcadia. It returns two ranked lists simultaneously: the top 100 traders by their composite Arcadia Score (which weighs risk-adjusted returns, consistency, and verified trade history) and the top 100 traders by raw 30-day return. Each entry includes AUM, drawdown, Sortino ratio, and score tier metadata — everything you need to build a trader discovery experience or rank comparison table.
+
+## Request
+
+This endpoint requires no parameters and no authentication.
+
+```bash
+curl -X GET "https://api.arcadia.trade/v1/leaderboard"
+```
+
+---
+
+## Response
+
+<ResponseField name="by_score" type="array">
+  The top 100 traders ranked by their Arcadia Score in descending order.
+
+  <Expandable title="LeaderboardEntry fields">
+    <ResponseField name="rank" type="number">
+      The trader's rank within this list (1 = highest score).
+    </ResponseField>
+
+    <ResponseField name="handle" type="string">
+      The trader's registered human-readable handle.
+    </ResponseField>
+
+    <ResponseField name="wallet" type="string">
+      The base58 public key of the trader's Solana wallet.
+    </ResponseField>
+
+    <ResponseField name="profile" type="string">
+      The base58 public key of the trader's vault profile PDA. Use this value
+      to query detailed vault state or trade history.
+    </ResponseField>
+
+    <ResponseField name="score" type="number">
+      The trader's composite Arcadia Score. Higher is better. Incorporates
+      risk-adjusted returns, trade history depth, and consistency signals.
+    </ResponseField>
+
+    <ResponseField name="tier" type="string">
+      The score tier band, e.g. `"Bronze"`, `"Silver"`, `"Gold"`,
+      `"Platinum"`.
+    </ResponseField>
+
+    <ResponseField name="confidence" type="number">
+      A value between `0` and `1` representing how much statistical confidence
+      Arcadia assigns to this trader's score given their trade sample size.
+    </ResponseField>
+
+    <ResponseField name="return_30d" type="number">
+      Percentage return over the trailing 30 days (e.g. `18.4` = 18.4%).
+    </ResponseField>
+
+    <ResponseField name="return_90d" type="number">
+      Percentage return over the trailing 90 days.
+    </ResponseField>
+
+    <ResponseField name="max_dd" type="number">
+      Maximum drawdown as a negative percentage (e.g. `-12.3` = 12.3% peak-to-trough
+      loss). Computed over the full lifetime of the vault.
+    </ResponseField>
+
+    <ResponseField name="sortino" type="number">
+      Sortino ratio computed on the vault's daily return series. Higher values
+      indicate better risk-adjusted performance penalising only downside
+      volatility.
+    </ResponseField>
+
+    <ResponseField name="aum" type="number">
+      Current assets under management in USDC.
+    </ResponseField>
+
+    <ResponseField name="trade_count" type="number">
+      Total number of closed trades recorded on-chain for this vault.
+    </ResponseField>
+
+    <ResponseField name="days_active" type="number">
+      Number of days since the vault was first initialised on-chain.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="by_return_30d" type="array">
+  The top 100 traders ranked by 30-day percentage return in descending order.
+  Each entry has the same `LeaderboardEntry` structure as `by_score`.
+</ResponseField>
+
+---
+
+## Example Response
+
+```json
+{
+  "by_score": [
+    {
+      "rank": 1,
+      "handle": "alpha_macro",
+      "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+      "profile": "BzHQpBRU5e2ZVPxq8dCRcHqMdVoP5kR7fLnW2aJtG4xY",
+      "score": 94.7,
+      "tier": "Platinum",
+      "confidence": 0.97,
+      "return_30d": 18.4,
+      "return_90d": 52.1,
+      "max_dd": -8.3,
+      "sortino": 3.82,
+      "aum": 100032.47,
+      "trade_count": 318,
+      "days_active": 210
+    },
+    {
+      "rank": 2,
+      "handle": "meridian_fx",
+      "wallet": "9pLmT3RbYuXsVhN8kJqC2wZoA7fGdE5cBnKiPvQrM4Wy",
+      "profile": "EqRsTuPvWxYzAbCdEfGhIjKlMnOpQrStUvWxYzAb1234",
+      "score": 88.2,
+      "tier": "Gold",
+      "confidence": 0.91,
+      "return_30d": 14.1,
+      "return_90d": 39.7,
+      "max_dd": -11.5,
+      "sortino": 2.94,
+      "aum": 73450.00,
+      "trade_count": 241,
+      "days_active": 175
+    }
+  ],
+  "by_return_30d": [
+    {
+      "rank": 1,
+      "handle": "momentum_9",
+      "wallet": "CkFpA8ZwNvBxMsYqE3rTuJ6hLdG2iOcXePbVnRmKtWyQ",
+      "profile": "FrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYzAbCd5678",
+      "score": 71.3,
+      "tier": "Silver",
+      "confidence": 0.74,
+      "return_30d": 31.6,
+      "return_90d": 28.2,
+      "max_dd": -22.8,
+      "sortino": 1.47,
+      "aum": 34800.00,
+      "trade_count": 89,
+      "days_active": 62
+    },
+    {
+      "rank": 2,
+      "handle": "alpha_macro",
+      "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+      "profile": "BzHQpBRU5e2ZVPxq8dCRcHqMdVoP5kR7fLnW2aJtG4xY",
+      "score": 94.7,
+      "tier": "Platinum",
+      "confidence": 0.97,
+      "return_30d": 18.4,
+      "return_90d": 52.1,
+      "max_dd": -8.3,
+      "sortino": 3.82,
+      "aum": 100032.47,
+      "trade_count": 318,
+      "days_active": 210
+    }
+  ]
+}
+```

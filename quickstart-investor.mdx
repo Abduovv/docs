@@ -1,0 +1,98 @@
+---
+title: "Get Started as an Investor on Arcadia"
+sidebarTitle: "Investor Quickstart"
+description: "Browse verified traders by Arcadia Score, deposit USDC into a non-custodial vault, and track your returns — all on Solana. No trust required."
+---
+
+You don't need to take a trader's word for it. Arcadia gives every investor access to a tamper-proof, on-chain performance record for every trader on the platform — distilled into a single Arcadia Score and a full set of risk metrics. You allocate USDC through a non-custodial smart-contract vault, which means your funds are always held by code, never by the trader. This guide walks you through the full process from wallet connection to active investment.
+
+<Note>
+  Arcadia is currently in **private beta**. You will need a waitlist invitation to access the investor dashboard. [Join the waitlist →](https://arcadia.trade)
+</Note>
+
+<Steps>
+  <Step title="Connect your wallet">
+    Arcadia uses **Sign-In With Solana (SIWS)** for authentication — your Solana wallet is your account.
+
+    1. Navigate to [app.arcadia.trade](https://app.arcadia.trade) and click **Connect Wallet**.
+    2. Select **Phantom** or **Solflare** from the wallet picker.
+    3. Approve the connection request in your wallet extension.
+    4. Sign the SIWS authentication message when prompted. This is a free, off-chain signature that proves wallet ownership and issues you a session JWT.
+
+    <Tip>
+      Only sign the SIWS message on `app.arcadia.trade`. The message includes a timestamp and domain binding — it cannot be reused, but always verify the domain in your wallet before signing.
+    </Tip>
+
+    Make sure your wallet holds USDC on Solana before proceeding — that is the base asset for all Arcadia vaults.
+  </Step>
+
+  <Step title="Browse the trader leaderboard">
+    From the **Discover** tab, you'll find the trader leaderboard ranked by Arcadia Score. Each row surfaces the most important metrics for evaluation:
+
+    - **Arcadia Score** (0–1000) — verified, on-chain reputation
+    - **Tier** — Verified, Established, Advanced, Elite, or Apex
+    - **30-Day Return** — time-weighted return over the trailing 30 days
+    - **Max Drawdown** — largest peak-to-trough NAV decline on record
+    - **AUM** — total USDC currently in the vault
+    - **Capacity** — remaining investor capital the vault can accept
+
+    Use the filters to narrow by tier, minimum score, maximum drawdown, or return threshold. Every metric shown is derived from on-chain data — nothing is self-reported.
+  </Step>
+
+  <Step title="Choose a trader and review their vault">
+    Click any trader to open their full profile. Before depositing, review:
+
+    - **NAV history** — how the vault's net asset value has changed over time
+    - **Open positions** — what the trader is currently holding
+    - **Trade history** — every completed trade, on-chain and auditable
+    - **Score breakdown** — individual metric contributions (TWR, Sharpe, Sortino, etc.)
+    - **Profit share rate** — the percentage of profits the trader keeps (20–40% depending on tier); you receive the remainder
+
+    <Note>
+      A vault must have `deposits_open = true` before you can invest. If a vault shows **Deposits Closed**, the trader has not yet opened their vault to new investors. Check back later or browse other traders.
+    </Note>
+
+    Take time to assess the trader's drawdown profile and consistency, not just their headline return. A lower maximum drawdown relative to returns often indicates more disciplined risk management.
+  </Step>
+
+  <Step title="Deposit USDC into the vault">
+    When you're ready to invest:
+
+    1. Click **Deposit** on the trader's vault page.
+    2. Enter the USDC amount you want to allocate.
+    3. Review the transaction details — confirm the vault address, your deposit amount, and the profit share rate.
+    4. Approve the transaction in your wallet.
+
+    Your USDC is transferred directly into the on-chain vault smart contract. The trader is granted trading authority over vault funds but has **no withdrawal authority** over investor capital — that is enforced by the contract and cannot be overridden.
+
+    <Warning>
+      Arcadia's non-custodial vault architecture protects you from theft — the trader cannot withdraw your USDC. However, it does **not** protect you from trading losses. If the trader loses money on positions, your share of the vault NAV will decline accordingly. Only invest capital you can afford to lose, and diversify across multiple traders.
+    </Warning>
+  </Step>
+
+  <Step title="Track your portfolio">
+    After depositing, your **Portfolio** dashboard shows your full investment picture in real time:
+
+    - **Your NAV** — current value of your share of each vault
+    - **Unrealized PnL** — mark-to-market change since your deposit
+    - **Realized PnL** — profits and losses from settled positions
+    - **Vault Activity** — live feed of every trade the trader makes with your capital
+    - **Withdrawal** — request a withdrawal at any time; funds are returned to your wallet directly from the vault contract
+
+    You can monitor multiple vault positions simultaneously and withdraw from each independently whenever you choose.
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Browse Traders" icon="magnifying-glass" href="/investors/browse-traders">
+    Learn how to filter, sort, and evaluate traders on the Arcadia leaderboard to find the right fit for your risk profile.
+  </Card>
+  <Card title="Deposit into a Vault" icon="arrow-down-to-bracket" href="/investors/deposit">
+    A detailed walkthrough of the deposit flow, transaction structure, and what to expect after your USDC enters a vault.
+  </Card>
+  <Card title="How Vaults Work" icon="vault" href="/concepts/vaults">
+    Understand the non-custodial vault architecture, custody boundaries, settlement mechanics, and withdrawal process.
+  </Card>
+</CardGroup>

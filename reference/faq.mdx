@@ -1,0 +1,89 @@
+---
+title: "Arcadia FAQ: Traders, Investors, and the Protocol"
+sidebarTitle: "FAQ"
+description: "Answers to the most common questions about Arcadia — how the score works, whether funds are safe, what happens with losses, and how to get started."
+---
+
+Arcadia brings together on-chain trading talent and capital through a system built on verified reputation and non-custodial smart-contract vaults. Whether you're a trader looking to attract investment or an investor evaluating a vault, the questions below cover how the protocol works, what the risks are, and how to get started. If you don't find what you're looking for here, reach out to the team on [Discord](https://discord.gg/arcadia).
+
+---
+
+## General
+
+<Accordion title="What is Arcadia?">
+  Arcadia is the allocation rail for on-chain trading talent. It turns real trading history into verified reputation, then lets capital flow to skilled traders through smart-contract vaults — no screenshots, no trust-me-bro track records.
+
+  Instead of forwarding funds to a discretionary manager and hoping for the best, investors allocate to a vault controlled by a smart contract. The trader can only operate within the rules the protocol enforces on-chain.
+</Accordion>
+
+<Accordion title="What is the Arcadia Score?">
+  The Arcadia Score is a 0–1000 reputation number built from a trader's real on-chain trading history. It rewards consistent, risk-aware performance — not one lucky trade or raw return.
+
+  The score accounts for factors like win rate, drawdown, position sizing discipline, and how long the track record has been building. A higher score unlocks access to more capital and better vault terms.
+</Accordion>
+
+<Accordion title="What wallets are supported?">
+  Arcadia supports **Phantom**, **Solflare**, and any Solana wallet that implements Sign-In With Solana (SIWS). If your wallet can sign a message with an ed25519 key, it will work.
+
+  For apps built on Privy, Arcadia also accepts Privy bearer tokens and exchanges them for a first-party session — see the [Authentication reference](/reference/authentication) for details.
+</Accordion>
+
+---
+
+## For Traders
+
+<Accordion title="Can a trader fake their reputation?">
+  No. The Arcadia Score is derived entirely from on-chain trading activity — positions opened and closed on Solana. There is no way to submit screenshots, manually enter trades, or otherwise inflate the score.
+
+  Reputation comes from the public record. Every trade that feeds the score is verifiable by anyone with a Solana explorer.
+</Accordion>
+
+<Accordion title="How does Arcadia make money?">
+  Arcadia takes a share of vault profit when a vault performs above its high-water mark, plus a small ongoing management fee on AUM. These fees are enforced and distributed automatically by the smart contract during settlement — no manual invoicing or trust required.
+
+  The exact fee rates are set in the `PlatformConfig` account on-chain and are visible to anyone.
+</Accordion>
+
+<Accordion title="How does a trader withdraw their performance fee?">
+  After a settlement event, accrued performance fees above the high-water mark are credited to the trader on-chain. The trader calls the `trader_withdraw_profit` instruction to transfer those funds to their wallet.
+
+  The smart contract will reject the call with `InsufficientClaimable` if there is no accrued profit to withdraw — your dashboard will reflect the available balance before you attempt a claim.
+</Accordion>
+
+---
+
+## For Investors
+
+<Accordion title="Can a trader run away with investor funds?">
+  No. When you deposit into an Arcadia vault, your capital goes into a **smart-contract-controlled PDA** — not the trader's wallet. The trader can only open and close trades within the protocol's rules. They cannot withdraw investor capital, transfer it to an external address, or bypass the vault logic.
+
+  Arcadia protects you from theft by design, not by promise.
+</Accordion>
+
+<Accordion title="Can I lose money as an investor?">
+  Yes. Arcadia protects you from theft, not from trading losses. If the vault trades at a loss, vault shares lose value proportionally — and when you redeem those shares, you receive less USDC than you deposited.
+
+  Before depositing, review the trader's Arcadia Score, drawdown history, and vault configuration (leverage limit, capacity). Past performance is on-chain and verifiable, but it does not guarantee future results.
+</Accordion>
+
+<Accordion title="What is the minimum deposit?">
+  Each vault enforces a minimum deposit amount at the smart-contract level. Deposits below this threshold are rejected with a `DustDeposit` error. The minimum is set by the trader when they initialise their vault and is visible on the vault's detail page.
+
+  Check the vault page for the current minimum before initiating a deposit transaction.
+</Accordion>
+
+<Accordion title="How long does withdrawal take?">
+  Withdrawals use a two-step notice period:
+
+  1. **Request** — You call `request_withdraw`, which queues your shares and records a `ready_ts` (the earliest timestamp you can process the withdrawal).
+  2. **Wait** — The notice period elapses. The length is set per-vault and is visible on the vault page.
+  3. **Process** — Once `ready_ts` has passed, you call `process_withdraw` to burn your shares and receive USDC.
+
+  The notice period protects vault stability by preventing sudden large outflows while the trader has open positions. Your dashboard shows a countdown timer so you know exactly when your withdrawal is ready to process.
+</Accordion>
+
+<Accordion title="Where are vault funds held?">
+  All vault funds are held **on-chain in a Solana PDA** (program-derived address) controlled exclusively by the Arcadia smart contract. No individual — not the trader, not the Arcadia team — can move funds out of a vault outside of the rules encoded in the program.
+
+  You can verify the vault's USDC balance at any time by inspecting the PDA address on any Solana explorer. The `TraderProfile` PDA address is deterministically derived from the trader's public key using the seed `["profile", trader_pubkey]`.
+</Accordion>

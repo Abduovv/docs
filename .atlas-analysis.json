@@ -1,0 +1,137 @@
+{
+  "projectType": "saas",
+  "projectName": "Arcadia",
+  "projectDescription": "A proof-of-performance capital protocol on Solana where traders earn capital by proving skill through a verified on-chain Arcadia Score, and investors allocate through non-custodial smart-contract vaults.",
+  "theme": "luma",
+  "primaryColor": "#7c7496",
+  "lightColor": "#21203c",
+  "darkColor": "#efeff0",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Docs",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart-trader",
+              "quickstart-investor"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/arcadia-score",
+              "concepts/tiers",
+              "concepts/vaults",
+              "concepts/non-custodial"
+            ]
+          },
+          {
+            "group": "Trader Guides",
+            "pages": [
+              "traders/connect-wallet",
+              "traders/initialize-vault",
+              "traders/trading-terminal",
+              "traders/profit-share"
+            ]
+          },
+          {
+            "group": "Investor Guides",
+            "pages": [
+              "investors/browse-traders",
+              "investors/deposit",
+              "investors/portfolio",
+              "investors/withdrawals"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/authentication",
+              "reference/smart-contract",
+              "reference/faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api/overview",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Traders",
+            "pages": [
+              "api/traders/list",
+              "api/traders/profile",
+              "api/traders/score-history",
+              "api/traders/classification"
+            ]
+          },
+          {
+            "group": "Investors",
+            "pages": [
+              "api/investors/account",
+              "api/investors/portfolio",
+              "api/investors/flows"
+            ]
+          },
+          {
+            "group": "Vaults & Markets",
+            "pages": [
+              "api/vaults/vault",
+              "api/vaults/trades",
+              "api/leaderboard",
+              "api/prices"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Arcadia Score (0–1000) — verifiable on-chain reputation derived from trading history",
+    "Five performance tiers: Verified, Established, Advanced, Elite, Apex — each unlocking higher capital capacity and profit share",
+    "Non-custodial smart-contract vaults — investor capital is held on-chain, never in the trader's wallet",
+    "Proof-of-performance capital allocation — capacity unlocked by score, not collateral",
+    "Trading terminal with live market data for perp positions (FlashTrade / Drift / Phoenix)",
+    "Investor portfolio dashboard with real-time NAV, PnL, and vault activity tracking",
+    "Leaderboard of top traders by Arcadia Score and 30-day return",
+    "Sign-In With Solana (SIWS) — wallet-native authentication, no passwords",
+    "Performance fee sharing: traders earn 20–40% of profits above high-water mark",
+    "Trader classification: automated bot/human detection and trading style labeling"
+  ],
+  "publicApiSurface": [
+    "GET /v1/traders — paginated trader list with scores, tiers, and capacity",
+    "GET /v1/traders/:handle — full trader profile with equity curve and trades",
+    "GET /v1/traders/:handle/score-history — historical Arcadia Score snapshots",
+    "GET /v1/traders/:handle/pnl-history — per-day realized PnL",
+    "GET /v1/traders/:handle/classification — bot/human verdict and style label",
+    "GET /v1/vaults/:profile — vault state: NAV/share, AUM, shares, HWM, status",
+    "GET /v1/vaults/:profile/trades — paginated trade history",
+    "GET /v1/vaults/:profile/nav-history — daily NAV + AUM history",
+    "GET /v1/leaderboard — top 100 by score and top 100 by 30-day return",
+    "GET /v1/prices — current Pyth price cache",
+    "GET /v1/score?wallet= — machine-readable score for a wallet (API key auth)",
+    "POST /v1/auth/challenge — issue SIWS nonce",
+    "POST /v1/auth/verify — verify SIWS signature and return JWT",
+    "POST /v1/auth/privy — verify Privy token and return JWT",
+    "GET /v1/investors/:wallet/account — investor positions and stats",
+    "GET /v1/investors/:wallet/portfolio — portfolio with current value and PnL",
+    "GET /v1/investors/:wallet/flows — deposit/withdrawal history",
+    "GET /v1/me — current user role and wallet",
+    "POST /v1/waitlist — waitlist signup",
+    "findTraderProfile(trader: PublicKey) — derive trader profile PDA",
+    "findInvestorAccount(wallet: PublicKey) — derive investor account PDA",
+    "fetchTraderProfile(connection, trader) — read on-chain trader profile",
+    "fetchInvestorAccount(connection, wallet) — read on-chain investor account",
+    "fetchInvestorPosition(connection, owner, profile) — read on-chain position"
+  ]
+}

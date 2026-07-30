@@ -1,0 +1,84 @@
+---
+title: "Trading on Arcadia: Terminal and Markets"
+sidebarTitle: "Trading Terminal"
+description: "Use the Arcadia trading terminal to open and close leveraged perp positions. All trades are recorded on-chain and factor into your Arcadia Score."
+---
+
+The Arcadia trading terminal is where your proof-of-performance record is built. Every trade you open and close is recorded on-chain — the market, direction, size, leverage, realised PnL, and liquidation status are all captured and fed into the scoring engine, which recalculates your Arcadia Score every hour. Trading well, consistently, and within risk limits is how you move up the tier ladder and unlock a larger profit share on the growing AUM investors bring to your vault.
+
+## Available Markets
+
+### Forex & Commodities — FlashTrade Perps
+
+Arcadia integrates with **FlashTrade** to offer leveraged perpetual positions on the following markets:
+
+| Market | Description |
+|---|---|
+| XAU/USD | Gold vs. US Dollar |
+| XAG/USD | Silver vs. US Dollar |
+| EUR/USD | Euro vs. US Dollar |
+| GBP/USD | British Pound vs. US Dollar |
+| USD/JPY | US Dollar vs. Japanese Yen |
+
+### Solana Perp DEXs
+
+In addition to FlashTrade markets, the terminal supports perpetual positions routed through Solana-native DEXs including **Drift** and **Phoenix**. Additional venues may be added as the protocol expands.
+
+## How Trades Affect Your Score
+
+Every time you close a trade, the following data points are written on-chain and read by the scoring engine on its next hourly run:
+
+- **Market and direction** (long or short)
+- **Position size** (USDC notional)
+- **Leverage used**
+- **Realised PnL** (in USDC)
+- **Liquidation status** (whether the position was liquidated)
+
+The scoring engine aggregates these events to calculate metrics including win rate, risk-adjusted return, and Guard Factor (which penalises liquidation rates above 5%). Scores update **hourly** — there is no manual refresh.
+
+## Opening a Trade
+
+<Steps>
+  <Step title="Select a market from the terminal">
+    Choose a market from the left-hand market panel. FlashTrade forex/commodity pairs and Solana DEX perp markets are listed in separate tabs.
+  </Step>
+  <Step title="Choose your direction">
+    Select **Long** if you expect the price to rise, or **Short** if you expect it to fall.
+  </Step>
+  <Step title="Set position size and leverage">
+    Enter your position size in USDC and choose a leverage multiplier up to your vault's `max_leverage` setting. The terminal will show the effective notional value and required margin.
+  </Step>
+  <Step title="Review the order summary">
+    Before submitting, confirm the entry price estimate, opening fee, and liquidation price shown in the order summary panel.
+  </Step>
+  <Step title="Submit the trade">
+    Click **Open Position**. The protocol's execution wallet opens the position on your behalf. All trades are routed through the execution wallet — a protocol-managed ephemeral keypair — so your personal wallet is never exposed to individual position risk.
+  </Step>
+  <Step title="Monitor your open positions">
+    Your active positions appear in the **Positions** tab of the terminal dashboard. You can see unrealised PnL, current leverage, and distance to liquidation in real time.
+  </Step>
+</Steps>
+
+## Protocol-Enforced Trade Constraints
+
+The smart contract enforces the following limits on every trade submission:
+
+| Constraint | Rule |
+|---|---|
+| Maximum position size | No single position may exceed **20% of vault AUM** |
+| Maximum leverage | Capped at your vault's `max_leverage` setting |
+| Liquidation threshold | Position is liquidated at **80% loss** of position margin (20% margin remaining) |
+
+These constraints cannot be overridden from the terminal and apply to every trade regardless of market.
+
+## Closing a Trade
+
+Navigate to the **Positions** tab, find the position you want to close, and click **Close**. The execution wallet submits the closing transaction, PnL is settled to the vault, and the trade record is written on-chain. The scoring engine will include this trade in the next hourly update.
+
+<Tip>
+  Consistent, risk-managed trades matter more for your Arcadia Score than a single large win. The Guard Factor actively penalises a liquidation rate above 5% — protecting your score means protecting your positions.
+</Tip>
+
+<Note>
+  Arcadia offers a **demo mode** for testing order flow and familiarising yourself with the terminal interface. Simulated trades in demo mode do not appear on-chain and do not count toward your Arcadia Score. Only live trades on mainnet contribute to your score and tier progression.
+</Note>

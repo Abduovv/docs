@@ -1,0 +1,219 @@
+---
+title: "Authenticate with Arcadia Using Your Wallet"
+sidebarTitle: "Authentication"
+description: "Arcadia uses Sign-In With Solana (SIWS) for passwordless auth. Request a nonce, sign a message with your wallet, and exchange the signature for a JWT."
+---
+
+Arcadia authenticates users through **Sign-In With Solana (SIWS)** — a passwordless, challenge-response protocol built on ed25519 wallet signatures. Instead of a username and password, you prove ownership of a Solana wallet by signing a canonical message, then exchange that signature for a short-lived JWT that gates every API call. For teams already using [Privy](https://privy.io), Arcadia also accepts Privy bearer tokens and mints a first-party JWT on your behalf.
+
+## Authentication Methods
+
+<CardGroup cols={2}>
+  <Card title="Sign-In With Solana" icon="wallet">
+    The primary method. Works with any Solana wallet (Phantom, Solflare, hardware wallets). No third-party dependency.
+  </Card>
+  <Card title="Privy" icon="key">
+    For apps already using Privy's embedded wallets. Exchange your existing Privy token for an Arcadia JWT in one request.
+  </Card>
+</CardGroup>
+
+---
+
+## Sign-In With Solana (SIWS)
+
+The SIWS flow has four steps: request a nonce, sign a canonical message, verify the signature, then attach the resulting JWT to every subsequent request.
+
+<Steps>
+  <Step title="Request a challenge nonce">
+    Send a `POST` to `/v1/auth/challenge` to receive a server-generated nonce. The nonce is a one-time-use token that binds the signature to this specific sign-in attempt.
+
+    ```http
+    POST /v1/auth/challenge
+    Content-Type: application/json
+    ```
+
+    **Response**
+
+    ```json
+    {
+      "nonce": "4xT9mR2kLqZ7vBpN",
+      "expires_at": "2025-01-15T12:05:00Z"
+    }
+    ```
+
+    <Note>
+      The nonce expires in **5 minutes**. Complete the sign-in flow quickly — if the nonce expires, request a new challenge before retrying.
+    </Note>
+  </Step>
+
+  <Step title="Sign the canonical message">
+    Construct the canonical sign-in message exactly as shown below and sign it with your wallet's ed25519 private key. Any deviation from this format will cause signature verification to fail.
+
+    **Canonical message format**
+
+    ```
+    Arcadia wants you to sign in with your Solana account:
+    {pubkey}
+
+    Nonce: {nonce}
+    ```
+
+    Replace `{pubkey}` with your base58-encoded wallet public key and `{nonce}` with the value returned in Step 1.
+
+    **Example (filled in)**
+
+    ```
+    Arcadia wants you to sign in with your Solana account:
+    7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU
+
+    Nonce: 4xT9mR2kLqZ7vBpN
+    ```
+  </Step>
+
+  <Step title="Verify the signature">
+    Send the wallet address, your base58-encoded signature, and the nonce to `/v1/auth/verify`.
+
+    ```http
+    POST /v1/auth/verify
+    Content-Type: application/json
+
+    {
+      "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+      "signature": "5J7z...<base58-encoded signature>",
+      "nonce": "4xT9mR2kLqZ7vBpN"
+    }
+    ```
+
+    **Response**
+
+    ```json
+    {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+      "expires_at": "2025-01-16T12:00:00Z"
+    }
+    ```
+
+    The returned JWT is signed with HS256, has a default expiry of **24 hours**, and its `sub` claim is set to your base58 wallet public key.
+  </Step>
+
+  <Step title="Attach the JWT to API requests">
+    Include the token in the `Authorization` header as a Bearer token on every authenticated request.
+
+    ```http
+    GET /v1/profile
+    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Full TypeScript Example
+
+The following example performs the complete SIWS flow using `@solana/web3.js` and the browser wallet adapter pattern.
+
+```typescript
+import { Connection, PublicKey } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const BASE_URL = "https://api.arcadia.trade";
+
+/**
+ * Performs the full SIWS flow and returns an Arcadia JWT.
+ *
+ * @param wallet  - An object with `publicKey` and a `signMessage` method
+ *                  (e.g. from @solana/wallet-adapter-react's useWallet())
+ */
+async function signInWithSolana(wallet: {
+  publicKey: PublicKey;
+  signMessage: (message: Uint8Array) => Promise<Uint8Array>;
+}): Promise<string> {
+  const pubkey = wallet.publicKey.toBase58();
+
+  // Step 1: Request challenge
+  const challengeRes = await fetch(`${BASE_URL}/v1/auth/challenge`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  const { nonce } = await challengeRes.json();
+
+  // Step 2: Build and sign the canonical message
+  const message =
+    `Arcadia wants you to sign in with your Solana account:\n` +
+    `${pubkey}\n\n` +
+    `Nonce: ${nonce}`;
+
+  const encodedMessage = new TextEncoder().encode(message);
+  const signatureBytes = await wallet.signMessage(encodedMessage);
+  const signature = bs58.encode(signatureBytes);
+
+  // Step 3: Verify signature and receive JWT
+  const verifyRes = await fetch(`${BASE_URL}/v1/auth/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ wallet: pubkey, signature, nonce }),
+  });
+
+  if (!verifyRes.ok) {
+    const err = await verifyRes.json();
+    throw new Error(`Auth failed: ${err.message}`);
+  }
+
+  const { token } = await verifyRes.json();
+  return token; // Store and attach as Authorization: Bearer <token>
+}
+```
+
+---
+
+## Privy Authentication
+
+If your app uses Privy for wallet management, you can exchange a valid Privy bearer token for an Arcadia JWT directly — no separate SIWS flow required.
+
+```http
+POST /v1/auth/privy
+Authorization: Bearer <privy-bearer-token>
+```
+
+**Response**
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+  "expires_at": "2025-01-16T12:00:00Z"
+}
+```
+
+<Tip>
+  Use the returned Arcadia JWT exactly as you would a SIWS-issued token — attach it as `Authorization: Bearer <token>` on all subsequent requests.
+</Tip>
+
+---
+
+## Machine-to-Machine: API Key Auth
+
+For server-side integrations that need to look up trader scores without a user session (e.g. a bot, a dashboard backend), use an API key instead of a JWT.
+
+```http
+GET /v1/score?wallet=7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU
+x-api-key: <your-api-key>
+```
+
+<Note>
+  API keys are stored as **SHA-256 hashes** on the server. Arcadia never stores the raw key — save yours securely at creation time. If you lose it, you must generate a new one.
+</Note>
+
+---
+
+## Token Expiry and Error Reference
+
+| Status Code | Meaning | What to do |
+|---|---|---|
+| `401 Unauthorized` | JWT is missing, expired, or malformed | Re-run the SIWS flow to get a fresh token |
+| `400 Bad Request` | Signature or nonce is invalid | Verify the canonical message format; request a new challenge |
+
+<Warning>
+  JWTs expire after **24 hours** by default. Build token-refresh logic into your app — when you receive a `401`, silently trigger a new SIWS flow and retry the original request.
+</Warning>

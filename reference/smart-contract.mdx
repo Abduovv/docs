@@ -1,0 +1,192 @@
+---
+title: "Arcadia Smart Contract: On-Chain Account Reference"
+sidebarTitle: "Smart Contract"
+description: "Reference for the Arcadia Vault Solana program: PDA seeds, key instructions, on-chain events, and error codes your integration needs to handle."
+---
+
+The Arcadia Vault program is a Solana smart contract that enforces all capital flows between investors and traders. Every deposit, withdrawal, and profit settlement happens on-chain — no off-chain custody, no operator override. This page covers the program ID, the Program-Derived Addresses (PDAs) that store state, the instructions you can call, the events the program emits, and the error codes your integration needs to handle gracefully.
+
+<Note>
+  The Arcadia program is currently deployed on **devnet**. Mainnet deployment details will be announced. Do not send real funds to the devnet program ID.
+</Note>
+
+---
+
+## Program ID
+
+| Network | Program ID |
+|---|---|
+| Devnet | `FPoAMRkM3kXfuvFn1iC2cM8B554KfnaPjibjLH31CHtd` |
+| Mainnet | TBA |
+
+---
+
+## Program-Derived Addresses (PDAs)
+
+Arcadia stores all state in PDAs. You derive each account address deterministically from its seeds — no lookups required.
+
+| Account | Seeds | Description |
+|---|---|---|
+| `PlatformConfig` | `["platform"]` | Global protocol configuration — fees, parameters, admin keys. One account per deployment. |
+| `TraderProfile` | `["profile", trader_pubkey]` | One vault per trader. Stores AUM, share count, high-water mark, leverage limits, and vault status. |
+| `InvestorAccount` | `["investor", wallet_pubkey]` | One account per investor wallet. Tracks aggregate positions and investor metadata. |
+| `InvestorPosition` | `["position", owner_pubkey, profile_pubkey]` | One position per investor × vault pair. Stores share balance and cost basis for a specific vault. |
+
+---
+
+## Key Instructions
+
+| Instruction | Who calls it | What it does |
+|---|---|---|
+| `initialize_profile` | Trader | Creates a new `TraderProfile` PDA and initialises the vault with the trader's configuration (leverage limit, capacity, minimum deposit). |
+| `deposit` | Investor or trader | Transfers USDC into the vault, mints shares proportional to the current NAV-per-share, and updates the investor's position. |
+| `request_withdraw` | Investor | Queues a withdrawal request. Records the number of shares to redeem and sets a `ready_ts` timestamp based on the vault's notice period. |
+| `process_withdraw` | Investor | Executes a matured withdrawal request. Burns shares, calculates the USDC redemption amount, and transfers funds to the investor's wallet. Can only be called after `ready_ts` has elapsed. |
+| `trader_withdraw_profit` | Trader | Allows the trader to claim accrued performance fees above the high-water mark after a settlement event. |
+
+<Tip>
+  Always call `request_withdraw` first and wait for the notice period to elapse before calling `process_withdraw`. Calling `process_withdraw` before `ready_ts` will fail with `NoticeNotElapsed`.
+</Tip>
+
+---
+
+## On-Chain Events
+
+The program emits structured events that your indexer or UI can subscribe to via Solana's program log stream. Each event is anchor-serialised and prefixed with an 8-byte discriminator.
+
+<Accordion title="Deposited">
+  Emitted when an investor or trader successfully deposits USDC into a vault.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `profile` | `Pubkey` | The `TraderProfile` PDA of the vault that received the deposit |
+  | `investor` | `Pubkey` | The wallet that made the deposit |
+  | `amount` | `u64` | USDC deposited (in lamports, 6 decimals) |
+  | `shares` | `u64` | Shares minted in exchange |
+  | `nav_per_share` | `u64` | NAV-per-share at the time of deposit |
+</Accordion>
+
+<Accordion title="WithdrawRequested">
+  Emitted when an investor queues a withdrawal request. The investor must wait until `ready_ts` before processing.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `profile` | `Pubkey` | The vault the investor is withdrawing from |
+  | `investor` | `Pubkey` | The wallet that submitted the request |
+  | `shares` | `u64` | Number of shares queued for redemption |
+  | `ready_ts` | `i64` | Unix timestamp after which the withdrawal can be processed |
+</Accordion>
+
+<Accordion title="Withdrawn">
+  Emitted when a matured withdrawal request is successfully processed and USDC is returned to the investor.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `profile` | `Pubkey` | The vault the investor withdrew from |
+  | `investor` | `Pubkey` | The wallet that received the USDC |
+  | `usdc_out` | `u64` | USDC transferred to the investor (6 decimals) |
+  | `shares_burned` | `u64` | Shares redeemed and destroyed |
+</Accordion>
+
+<Accordion title="TradeClosed">
+  Emitted when a trade is closed and its outcome is recorded on-chain. This is the primary input to the Arcadia Score.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `profile` | `Pubkey` | The vault whose trader closed the position |
+  | `market` | `Pubkey` | The market or perp account the trade was on |
+  | `direction` | `u8` | Trade direction (`0` = long, `1` = short) |
+  | `entry_px` | `u64` | Entry price (scaled) |
+  | `exit_px` | `u64` | Exit price (scaled) |
+  | `realized_pnl` | `i64` | Signed PnL in USDC (positive = profit, negative = loss) |
+  | `was_liquidated` | `bool` | Whether the position was closed by liquidation |
+</Accordion>
+
+<Accordion title="Settled">
+  Emitted at the end of a settlement period. Records the fee split between the trader and the protocol, and updates the vault's high-water mark.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `profile` | `Pubkey` | The vault that was settled |
+  | `trader_fee` | `u64` | Performance fee credited to the trader |
+  | `platform_fee` | `u64` | Management/performance fee credited to Arcadia |
+  | `new_hwm` | `u64` | Updated high-water mark NAV-per-share after settlement |
+</Accordion>
+
+<Accordion title="ProfitWithdrawn">
+  Emitted when a trader successfully withdraws their accrued performance fee.
+
+  | Field | Type | Description |
+  |---|---|---|
+  | `profile` | `Pubkey` | The vault from which profit was withdrawn |
+  | `trader` | `Pubkey` | The trader's wallet that received the USDC |
+  | `amount` | `u64` | USDC transferred to the trader (6 decimals) |
+</Accordion>
+
+---
+
+## Error Codes
+
+When a transaction fails, the program returns one of the following custom errors. Surface these to users with the descriptions below.
+
+| Error | Meaning | How to handle |
+|---|---|---|
+| `VaultNotActive` | The vault is paused or closed | Inform the user the vault is not currently accepting activity. Check vault status before submitting. |
+| `ZeroAmount` | A deposit or withdrawal of 0 USDC was submitted | Validate that the amount is greater than zero before building the transaction. |
+| `InsufficientFunds` | The vault does not have enough USDC to cover the withdrawal | The vault may be fully deployed in open positions. Ask the user to try again after positions settle. |
+| `LeverageTooHigh` | The trade would exceed the vault's configured `max_leverage` | Reduce position size or leverage. Display the vault's current leverage limit to the user. |
+| `NotionalTooLarge` | A single trade exceeds 20% of vault AUM | Split the trade into smaller orders or wait for AUM to grow. |
+| `CapacityExceeded` | The deposit would push vault AUM above its capacity ceiling | Inform the investor the vault is full. They can join a waitlist or try another vault. |
+| `DustDeposit` | The deposit amount is below the vault's minimum | Show the minimum deposit amount from the `TraderProfile` account and prompt the user to deposit more. |
+| `NoticeNotElapsed` | `process_withdraw` was called before `ready_ts` | Display `ready_ts` to the user as a countdown timer. Disable the "Withdraw" button until the timestamp passes. |
+| `InsufficientShares` | The investor does not have enough shares to redeem | Validate share balance from the `InvestorPosition` account before building the transaction. |
+| `InsufficientClaimable` | The trader called `trader_withdraw_profit` but has no accrued profit | Disable the claim button until a `Settled` event with a non-zero `trader_fee` has been emitted. |
+
+---
+
+## TypeScript SDK Helpers
+
+The Arcadia TypeScript SDK (`arcadia-sdk`) exposes utilities for deriving and fetching on-chain accounts. Install it with your package manager, then use the helpers below.
+
+### Derive PDA addresses
+
+```typescript
+import { PublicKey } from "@solana/web3.js";
+import { findTraderProfile, findInvestorAccount, findInvestorPosition } from "arcadia-sdk";
+
+const PROGRAM_ID = new PublicKey("FPoAMRkM3kXfuvFn1iC2cM8B554KfnaPjibjLH31CHtd");
+
+// Derive a trader's vault PDA
+const traderKey = new PublicKey("7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU");
+const [traderProfile] = findTraderProfile(traderKey, PROGRAM_ID);
+
+// Derive an investor's account PDA
+const investorKey = new PublicKey("9mZoW3rPqX1sBkL2vCnTy8dFhGjKuRe4iAw6sNpYx5M");
+const [investorAccount] = findInvestorAccount(investorKey, PROGRAM_ID);
+
+// Derive a specific investor × vault position PDA
+const [investorPosition] = findInvestorPosition(investorKey, traderProfile, PROGRAM_ID);
+```
+
+### Fetch account data
+
+```typescript
+import { Connection } from "@solana/web3.js";
+import { fetchTraderProfile, fetchInvestorAccount } from "arcadia-sdk";
+
+const connection = new Connection("https://api.devnet.solana.com");
+
+// Fetch and decode a TraderProfile account
+const profile = await fetchTraderProfile(connection, traderKey);
+console.log("Vault AUM:", profile.aum);
+console.log("NAV per share:", profile.navPerShare);
+console.log("High-water mark:", profile.highWaterMark);
+
+// Fetch and decode an InvestorAccount
+const account = await fetchInvestorAccount(connection, investorKey);
+console.log("Total positions:", account.positionCount);
+```
+
+<Tip>
+  All `find*` helpers return a tuple of `[PublicKey, bump]` — the same pattern as `PublicKey.findProgramAddressSync`. Cache the derived address; re-deriving on every render is unnecessary but harmless.
+</Tip>

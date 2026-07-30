@@ -1,0 +1,76 @@
+---
+title: "Arcadia: Where Performance Earns Capital"
+sidebarTitle: "Introduction"
+description: "Learn how Arcadia converts on-chain trading history into a verified Arcadia Score, unlocking non-custodial capital allocation for proven traders on Solana."
+---
+
+Arcadia is a proof-of-performance capital protocol built on Solana. It solves a fundamental problem in decentralized finance: skilled traders can't credibly prove their performance to investors, and investors have no reliable way to verify the claims traders make. Arcadia replaces self-reported track records and PDFs with a cryptographically verifiable, continuously updated Arcadia Score — derived entirely from on-chain trading history. Investors then allocate capital through non-custodial smart-contract vaults that enforce strict boundaries between trading access and fund custody.
+
+## Two Roles, One Protocol
+
+<Tabs>
+  <Tab title="Traders">
+    As a trader on Arcadia, you connect your Solana wallet and start trading on supported markets. Every position you open, hold, and close is recorded on-chain. The protocol derives your **Arcadia Score** (0–1000) from that history using a multi-factor model that weighs time-weighted return, Sharpe ratio, Sortino ratio, maximum drawdown, and win rate — among other signals.
+
+    As your score grows, you advance through tiers: **Verified**, **Established**, **Advanced**, **Elite**, and **Apex**. Each tier unlocks a higher capital capacity and a larger profit share on investor returns — from 20% at Verified up to 40% at Apex. You must self-fund your vault first before investor capital can flow in, which ensures your interests are always aligned with your investors.
+
+    **What you can do:**
+    - Trade XAU/USD, XAG/USD, EUR/USD, GBP/USD, USD/JPY, and Solana perp DEXs
+    - Build a verifiable track record that investors can inspect
+    - Unlock greater capital allocation as your score improves
+    - Earn a profit share without giving up strategy control
+  </Tab>
+  <Tab title="Investors">
+    As an investor on Arcadia, you browse a leaderboard of traders ranked by their Arcadia Score. Each trader's profile shows their score, tier, 30-day return, maximum drawdown, and current vault capacity. You choose a trader whose verified track record meets your criteria and deposit USDC directly into their on-chain vault.
+
+    The key distinction is custody: **you never hand your funds to the trader**. The smart contract holds your USDC. The trader can open and close positions using vault capital, but the contract enforces a hard boundary — the trader cannot withdraw investor funds under any circumstances. When you want to exit, you withdraw directly from the vault.
+
+    **What you get:**
+    - On-chain verified performance data — no unaudited claims
+    - Non-custodial protection through smart-contract vaults
+    - Transparent, real-time NAV and PnL tracking
+    - Returns settled automatically on-chain at the vault's profit-share rate
+  </Tab>
+</Tabs>
+
+## The Arcadia Score
+
+The Arcadia Score is a single number between 0 and 1000 that represents a trader's verified, risk-adjusted performance. It is computed continuously from on-chain trading history using a weighted model that includes:
+
+- **Time-Weighted Return (TWR)** — measures compounded returns independent of capital flow timing
+- **Sharpe Ratio** — return per unit of total volatility
+- **Sortino Ratio** — return per unit of downside volatility
+- **Maximum Drawdown** — largest peak-to-trough decline in vault NAV
+- **Win Rate** — percentage of trades closed in profit
+
+No score is ever self-reported. Every input is derived from on-chain activity, making the score tamper-resistant and independently verifiable by anyone. Higher scores unlock higher tiers and greater investor capital capacity.
+
+<Tip>
+  For a full breakdown of the scoring model, weighting methodology, and how scores are updated, see [Arcadia Score](/concepts/arcadia-score).
+</Tip>
+
+## Non-Custodial Vaults
+
+Every trader on Arcadia operates through a dedicated on-chain vault program. When an investor deposits USDC, the funds are held by the smart contract — not by the trader, and not by Arcadia. The trader is granted trading authority, meaning they can direct the vault's capital into supported positions, but withdrawal authority is strictly reserved for the investor.
+
+This architecture means:
+
+- **Investors retain custody** of their principal at all times
+- **Traders can never rug** investor funds — the contract simply won't allow it
+- **Settlement is automatic** — profit share is calculated and distributed on-chain without manual intervention
+- **Transparency is total** — vault NAV, open positions, and all historical trades are publicly readable on Solana
+
+<Tip>
+  For a deep dive into vault mechanics, deposit flows, and settlement logic, see [Vaults](/concepts/vaults).
+</Tip>
+
+## Get Started
+
+<CardGroup cols={2}>
+  <Card title="Trader Quickstart" icon="chart-line" href="/quickstart-trader">
+    Connect your wallet, initialize your vault, and start building the on-chain track record that earns you capital.
+  </Card>
+  <Card title="Investor Quickstart" icon="coins" href="/quickstart-investor">
+    Browse verified traders, review their vault metrics, and deposit USDC into a non-custodial vault in minutes.
+  </Card>
+</CardGroup>

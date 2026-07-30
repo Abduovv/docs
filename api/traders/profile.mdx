@@ -1,0 +1,311 @@
+---
+title: "GET /v1/traders/:handle — Full Trader Profile"
+sidebarTitle: "Trader Profile"
+description: "GET /v1/traders/:handle returns a trader's full profile including Arcadia Score, equity curve, trade history, metrics, and vault capacity."
+---
+
+The `/v1/traders/:handle` endpoint returns everything Arcadia knows about a single trader — their Arcadia Score and confidence interval, full performance metrics, a time-weighted equity curve since vault inception, paginated trade history, vault capacity utilisation, and more. This is the primary endpoint for building trader detail pages, due-diligence tooling, or any flow where an investor needs a complete picture before committing capital.
+
+## Request
+
+```
+GET https://api.arcadia.trade/v1/traders/:handle
+```
+
+### Path Parameters
+
+<ParamField path="handle" type="string" required>
+  The trader's unique Arcadia handle (username). Handles are case-insensitive.
+</ParamField>
+
+## Response
+
+Returns a `TraderProfile` object containing all `TraderListItem` fields plus the extended fields documented below.
+
+<ResponseField name="handle" type="string" required>
+  The trader's unique display name on Arcadia.
+</ResponseField>
+
+<ResponseField name="wallet" type="string" required>
+  The trader's Solana wallet address in base58 encoding.
+</ResponseField>
+
+<ResponseField name="profile" type="string" required>
+  The on-chain PDA of the trader's Arcadia profile account, in base58 encoding.
+</ResponseField>
+
+<ResponseField name="score" type="number" required>
+  Current Arcadia Score (0–1000).
+</ResponseField>
+
+<ResponseField name="tier" type="string" required>
+  Performance tier. One of `Verified`, `Established`, `Advanced`, `Elite`, or `Apex`.
+</ResponseField>
+
+<ResponseField name="confidence" type="string" required>
+  Statistical confidence in the score. One of `low`, `med`, or `high`.
+</ResponseField>
+
+<ResponseField name="capacity_usd" type="number" required>
+  Maximum investor capital this vault can accept, in USDC (6 decimal places).
+</ResponseField>
+
+<ResponseField name="aum" type="number" required>
+  Current assets under management in USDC (6 decimal places).
+</ResponseField>
+
+<ResponseField name="return_30d" type="number" required>
+  30-day return percentage.
+</ResponseField>
+
+<ResponseField name="max_dd" type="number" required>
+  Maximum drawdown over full vault history, as a percentage.
+</ResponseField>
+
+<ResponseField name="sortino" type="number" required>
+  Sortino ratio over the trailing 90 days.
+</ResponseField>
+
+<ResponseField name="deposits_open" type="boolean" required>
+  Whether the vault is currently accepting new investor deposits.
+</ResponseField>
+
+<ResponseField name="style_tags" type="string[]" required>
+  Trading style labels assigned to this trader.
+</ResponseField>
+
+<ResponseField name="trader_self_funded" type="number" required>
+  Trader's own capital currently in the vault, in USDC (6 decimal places).
+</ResponseField>
+
+<ResponseField name="bio" type="string">
+  Optional free-text bio provided by the trader. May be `null` if not set.
+</ResponseField>
+
+<ResponseField name="investors_count" type="number" required>
+  Number of unique investor addresses currently allocated to this vault.
+</ResponseField>
+
+<ResponseField name="days_active" type="number" required>
+  Number of days since the vault was first funded and began trading.
+</ResponseField>
+
+<ResponseField name="trade_count" type="number" required>
+  Total number of closed trades recorded on-chain for this vault.
+</ResponseField>
+
+<ResponseField name="max_leverage" type="number" required>
+  Maximum leverage used in any single trade over the vault's full history.
+</ResponseField>
+
+<ResponseField name="ci" type="object" required>
+  95% confidence interval on the trader's Arcadia Score.
+
+  <Expandable title="ci fields">
+    <ResponseField name="lo" type="number" required>
+      Lower bound of the 95% confidence interval.
+    </ResponseField>
+    <ResponseField name="point" type="number" required>
+      Point estimate (same as `score`).
+    </ResponseField>
+    <ResponseField name="hi" type="number" required>
+      Upper bound of the 95% confidence interval.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="capacity" type="object" required>
+  Vault capacity utilisation.
+
+  <Expandable title="capacity fields">
+    <ResponseField name="total" type="number" required>
+      Maximum capital the vault can accept, in USDC (6 decimal places).
+    </ResponseField>
+    <ResponseField name="used" type="number" required>
+      Capital currently deployed or reserved in the vault, in USDC (6 decimal places).
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="metrics" type="object" required>
+  Extended performance and risk metrics.
+
+  <Expandable title="metrics fields">
+    <ResponseField name="sharpe" type="number" required>
+      Sharpe ratio over the trailing 90 days.
+    </ResponseField>
+    <ResponseField name="sortino" type="number" required>
+      Sortino ratio over the trailing 90 days.
+    </ResponseField>
+    <ResponseField name="win_rate" type="number" required>
+      Fraction of closed trades that were profitable, from 0 to 1 (e.g. `0.63` means 63% win rate).
+    </ResponseField>
+    <ResponseField name="avg_trade_duration_hours" type="number" required>
+      Average time a position is held open, in hours.
+    </ResponseField>
+    <ResponseField name="total_trades" type="number" required>
+      Total number of closed trades recorded on-chain.
+    </ResponseField>
+    <ResponseField name="max_dd" type="number" required>
+      Maximum drawdown over the full vault history, as a percentage.
+    </ResponseField>
+    <ResponseField name="return_7d" type="number" required>
+      Return over the trailing 7 days, as a percentage.
+    </ResponseField>
+    <ResponseField name="return_30d" type="number" required>
+      Return over the trailing 30 days, as a percentage.
+    </ResponseField>
+    <ResponseField name="return_90d" type="number" required>
+      Return over the trailing 90 days, as a percentage.
+    </ResponseField>
+    <ResponseField name="return_all" type="number" required>
+      Cumulative return since vault inception, as a percentage.
+    </ResponseField>
+    <ResponseField name="vol_30d" type="number" required>
+      Annualised return volatility over the trailing 30 days, as a percentage.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="equity_curve" type="object[]" required>
+  Daily time-weighted return (TWR) index values from vault inception to the latest settlement.
+
+  <Expandable title="equity_curve item fields">
+    <ResponseField name="ts" type="number" required>
+      Unix timestamp (seconds) for this data point, snapped to midnight UTC.
+    </ResponseField>
+    <ResponseField name="value" type="number" required>
+      TWR index value. The series starts at `1.0` on inception day; a value of `1.18` means 18% cumulative return since inception.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="trades" type="object[]" required>
+  Array of closed `TradeRecord` objects, most recent first.
+
+  <Expandable title="TradeRecord fields">
+    <ResponseField name="id" type="string" required>
+      Unique identifier for this trade record.
+    </ResponseField>
+    <ResponseField name="market" type="string" required>
+      The perpetual market traded, e.g. `"SOL-PERP"` or `"BTC-PERP"`.
+    </ResponseField>
+    <ResponseField name="direction" type="string" required>
+      Position direction. Either `"long"` or `"short"`.
+    </ResponseField>
+    <ResponseField name="size_usd" type="number" required>
+      Notional position size in USDC (6 decimal places).
+    </ResponseField>
+    <ResponseField name="leverage" type="number" required>
+      Leverage used for this position.
+    </ResponseField>
+    <ResponseField name="entry_px" type="number" required>
+      Entry price in USDC.
+    </ResponseField>
+    <ResponseField name="exit_px" type="number" required>
+      Exit price in USDC.
+    </ResponseField>
+    <ResponseField name="realized_pnl" type="number" required>
+      Realised profit or loss for this trade in USDC (6 decimal places). Negative values indicate a loss.
+    </ResponseField>
+    <ResponseField name="fees_usd" type="number" required>
+      Total fees paid to open and close this position, in USDC (6 decimal places).
+    </ResponseField>
+    <ResponseField name="was_liquidated" type="boolean" required>
+      `true` if the position was closed by liquidation rather than by the trader.
+    </ResponseField>
+    <ResponseField name="opened_at" type="number" required>
+      Unix timestamp (seconds) when the position was opened.
+    </ResponseField>
+    <ResponseField name="closed_at" type="number" required>
+      Unix timestamp (seconds) when the position was closed.
+    </ResponseField>
+    <ResponseField name="sig" type="string">
+      Optional Solana transaction signature for the closing instruction. May be `null` for older records.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+### cURL
+
+```bash
+curl https://api.arcadia.trade/v1/traders/apex_trader
+```
+
+### Response
+
+```json
+{
+  "handle": "apex_trader",
+  "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+  "profile": "3Fg9NqTzPpRh8kXsWmYdEvUv4LcSZqNb1oDrF7KjHmVp",
+  "score": 912,
+  "tier": "Apex",
+  "confidence": "high",
+  "capacity_usd": 2000000000000,
+  "aum": 847320150000,
+  "return_30d": 18.43,
+  "max_dd": 6.21,
+  "sortino": 4.87,
+  "deposits_open": true,
+  "style_tags": ["trend-following", "momentum"],
+  "trader_self_funded": 250000000000,
+  "bio": "Full-time perps trader. Trend-following strategies on SOL, BTC, and ETH. Risk-first.",
+  "investors_count": 38,
+  "days_active": 214,
+  "trade_count": 1043,
+  "max_leverage": 10,
+  "ci": {
+    "lo": 887,
+    "point": 912,
+    "hi": 934
+  },
+  "capacity": {
+    "total": 2000000000000,
+    "used": 847320150000
+  },
+  "metrics": {
+    "sharpe": 3.41,
+    "sortino": 4.87,
+    "win_rate": 0.67,
+    "avg_trade_duration_hours": 5.2,
+    "total_trades": 1043,
+    "max_dd": 6.21,
+    "return_7d": 4.12,
+    "return_30d": 18.43,
+    "return_90d": 41.07,
+    "return_all": 118.34,
+    "vol_30d": 22.15
+  },
+  "equity_curve": [
+    { "ts": 1704067200, "value": 1.0 },
+    { "ts": 1704153600, "value": 1.023 },
+    { "ts": 1704240000, "value": 1.051 },
+    { "ts": 1704326400, "value": 1.038 },
+    { "ts": 1704412800, "value": 1.089 }
+  ],
+  "trades": [
+    {
+      "id": "trd_9Kxm2PqRvNbLcZdF",
+      "market": "SOL-PERP",
+      "direction": "long",
+      "size_usd": 50000000000,
+      "leverage": 5,
+      "entry_px": 182.40,
+      "exit_px": 196.75,
+      "realized_pnl": 3937500000,
+      "fees_usd": 75000000,
+      "was_liquidated": false,
+      "opened_at": 1717430400,
+      "closed_at": 1717459200,
+      "sig": "5KtQrNxPvGmWjYdL3FbAoHsUzCeRpT9nMk7DwXqViBfJ2ygEuZchs6NK4Wa8sRv"
+    }
+  ]
+}
+```
+
+<Note>
+  The `equity_curve` array contains daily TWR index values. The series always starts at `1.0` on the vault's inception day. A value of `1.18` means the vault has returned 18% cumulatively since inception. Values below `1.0` indicate a net loss from the starting point.
+</Note>

@@ -1,0 +1,57 @@
+---
+title: "Initialize Your Trader Vault on Arcadia"
+sidebarTitle: "Initialize Vault"
+description: "Create your on-chain trader vault, set your leverage limit, and make your first self-funded deposit to prove skin in the game before investors can allocate."
+---
+
+Before any investor can allocate capital to your vault, you must fund it yourself. This requirement is intentional: Arcadia's proof-of-performance model is built on demonstrated skin in the game. Self-funding your vault signals conviction to prospective investors and ensures that you, as the trader, have real capital at risk alongside them. Once your vault is active and your Arcadia Score starts climbing, investors can begin allocating through the protocol's non-custodial smart-contract vaults.
+
+## What Happens On-Chain
+
+Initializing your vault creates a **TraderProfile PDA** (program-derived address) on Solana, seeded with your wallet's public key:
+
+```
+Seeds: [b"profile", trader_pubkey]
+Program ID: FPoAMRkM3kXfuvFn1iC2cM8B554KfnaPjibjLH31CHtd
+```
+
+This account stores your vault configuration (including `max_leverage`), your current Arcadia Score, your tier, and the address of your vault token account. Your score tier is initialized to **Verified** (the entry tier) and updates hourly as the scoring engine processes your on-chain trade history.
+
+## Initialize Your Vault
+
+<Steps>
+  <Step title="Navigate to Dashboard → Initialize Profile">
+    From the Arcadia dashboard, click **Initialize Profile** in the trader onboarding panel. You must have your wallet connected before this option is available.
+  </Step>
+  <Step title="Set your maximum leverage">
+    Choose the maximum leverage your vault will allow for any individual trade. This value is stored in the `max_leverage` field of your TraderProfile PDA and is visible to investors. See the guidance table below before deciding.
+  </Step>
+  <Step title="Sign the initialize_profile transaction">
+    Review and confirm the `initialize_profile` transaction in your wallet. This transaction creates your on-chain TraderProfile PDA and pays the account rent. A small amount of SOL is required for rent; USDC is not transferred at this step.
+  </Step>
+  <Step title="Deposit USDC into your vault">
+    Once your profile is initialized, deposit USDC from your connected wallet into the vault. This is your founding deposit — it mints your initial vault shares and establishes the vault's starting NAV and high-water mark.
+  </Step>
+  <Step title="Your vault is now active">
+    Your vault is live on-chain. Your Arcadia Score starts at the Verified floor (100) and will build as you trade. Investor deposits are now enabled once you meet any minimum AUM requirements shown in your dashboard.
+  </Step>
+</Steps>
+
+## Choosing Your Maximum Leverage
+
+Your `max_leverage` setting is a permanent commitment for the lifetime of the vault. Use the table below to match your setting to your trading strategy and risk profile.
+
+| Max Leverage | Typical Use Case |
+|---|---|
+| 2–3× | Conservative, long-only strategies |
+| 5× | Balanced intraday trading |
+| 10× | Active scalping |
+| 20× | High-frequency, high-risk strategies |
+
+<Warning>
+  Your maximum leverage **cannot be lowered** after initialization without creating an entirely new vault. Choose conservatively — investors can see your `max_leverage` setting, and lower limits are generally associated with higher investor confidence and larger allocations.
+</Warning>
+
+<Note>
+  You must maintain at least some USDC in your vault at all times before investors can deposit. Dust deposits (negligibly small amounts) are rejected by the smart contract. Check the current minimum deposit requirement in the dashboard before funding.
+</Note>

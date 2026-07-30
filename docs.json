@@ -1,72 +1,113 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "theme": "luma",
+  "name": "Arcadia",
+  "favicon": "https://media.brand.dev/d8489e5e-7e00-4446-a122-d9353df623a4.png",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "primary": "#7c7496",
+    "light": "#21203c",
+    "dark": "#efeff0"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "label": "Join Waitlist",
+      "href": "https://arcadia.trade/waitlist"
     }
   },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Docs",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart-trader",
+              "quickstart-investor"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/arcadia-score",
+              "concepts/tiers",
+              "concepts/vaults",
+              "concepts/non-custodial"
+            ]
+          },
+          {
+            "group": "Trader Guides",
+            "pages": [
+              "traders/connect-wallet",
+              "traders/initialize-vault",
+              "traders/trading-terminal",
+              "traders/profit-share"
+            ]
+          },
+          {
+            "group": "Investor Guides",
+            "pages": [
+              "investors/browse-traders",
+              "investors/deposit",
+              "investors/portfolio",
+              "investors/withdrawals"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/authentication",
+              "reference/smart-contract",
+              "reference/faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api/overview",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Traders",
+            "pages": [
+              "api/traders/list",
+              "api/traders/profile",
+              "api/traders/score-history",
+              "api/traders/classification"
+            ]
+          },
+          {
+            "group": "Investors",
+            "pages": [
+              "api/investors/account",
+              "api/investors/portfolio",
+              "api/investors/flows"
+            ]
+          },
+          {
+            "group": "Vaults & Markets",
+            "pages": [
+              "api/vaults/vault",
+              "api/vaults/trades",
+              "api/leaderboard",
+              "api/prices"
+            ]
+          }
+        ]
+      }
     ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/arcadia_trade"
     }
   }
 }

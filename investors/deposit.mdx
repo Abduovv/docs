@@ -1,0 +1,73 @@
+---
+title: "Deposit USDC into an Arcadia Trader Vault"
+sidebarTitle: "Deposit"
+description: "Deposit USDC into a trader's non-custodial vault and receive vault shares. Your funds are held by a Solana smart contract, not the trader's wallet."
+---
+
+When you deposit into an Arcadia trader vault, your USDC is held by a Solana smart contract — not forwarded to the trader's wallet. The trader never takes custody of your funds. Instead, you receive vault shares proportional to your deposit at the current NAV per share, and the smart contract governs all movement of capital. This structure means your investment is governed by code, not trust.
+
+## Prerequisites
+
+Before you can deposit, make sure you have:
+
+- A connected Phantom or Solflare wallet authenticated via Sign-In With Solana (SIWS)
+- A USDC balance on Solana sufficient to cover your intended deposit
+- A small amount of SOL in your wallet to pay Solana transaction fees
+- A target trader whose vault shows `deposits_open = true`
+
+If the vault's deposit window is closed, you won't be able to deposit until the trader or platform reopens it.
+
+## How to Deposit
+
+<Steps>
+  <Step title="Navigate to the trader's profile">
+    Find the trader you want to back using the leaderboard or a direct link. Open their profile page to see their full metrics, equity curve, and vault details.
+  </Step>
+  <Step title="Review the vault details">
+    Before committing any capital, check the vault's current **NAV per share**, **total AUM**, and **capacity used**. Confirm that `deposits_open` shows as active. If capacity is nearly full or deposits are closed, consider a different vault.
+  </Step>
+  <Step title="Click Deposit">
+    Select the **Deposit** button on the trader's profile page. This opens the deposit dialog with the current share price pre-loaded.
+  </Step>
+  <Step title="Enter your USDC amount">
+    Type in the amount of USDC you want to deposit. The interface will display the estimated number of vault shares you'll receive based on the current NAV per share.
+  </Step>
+  <Step title="Review the share price and estimated shares">
+    Confirm the displayed NAV per share and the share count you'll receive. This is the rate at which your USDC converts to vault ownership. There are no hidden fees or slippage adjustments on the deposit itself.
+  </Step>
+  <Step title="Confirm and sign the deposit transaction">
+    Your wallet will prompt you to sign the transaction. Review the details in your wallet's signing dialog, then approve. The transaction is submitted to the Solana network.
+  </Step>
+  <Step title="Your position is created on-chain">
+    Once the transaction confirms, your **InvestorPosition** is created on-chain. Your vault shares appear in your Arcadia portfolio dashboard. You're now a fractional owner of the vault's NAV.
+  </Step>
+</Steps>
+
+## What Happens On-Chain
+
+When your deposit transaction confirms:
+
+1. Your USDC is transferred to the **vault's program-derived address (PDA) token account** — a smart contract account controlled solely by the vault program.
+2. Vault shares are minted and credited to your **InvestorPosition** at the current NAV per share.
+3. The vault's total AUM increases by your deposit amount, and the capacity used counter updates accordingly.
+
+The trader cannot withdraw your USDC to their personal wallet. All capital movements — including eventual withdrawals — are governed by the smart contract.
+
+## Share Price Example
+
+Vault shares start at a price of 1.0 USDC each and grow as the trader generates profit. Here's how the math works in practice:
+
+| Scenario | NAV per Share | USDC Deposited | Shares Received | Value if NAV Reaches 1.35 |
+|---|---|---|---|---|
+| At deposit | 1.18 | 1,000 USDC | ≈ 847 shares | — |
+| After growth | 1.35 | — | 847 shares | ≈ 1,143 USDC |
+
+If NAV per share is **1.18** at the time you deposit **1,000 USDC**, you receive approximately **847 shares**. If the vault later grows to a NAV of **1.35**, those same 847 shares are worth approximately **1,143 USDC** — a gain of ~143 USDC on your original deposit.
+
+<Warning>
+  Deposits are subject to a minimum amount enforced by the smart contract. Amounts below the minimum will be rejected to prevent dust positions. Make sure your USDC balance covers the full deposit amount, and that your wallet holds enough SOL to pay Solana network transaction fees.
+</Warning>
+
+<Note>
+  If `deposits_open` is set to false for a vault, the smart contract will reject new deposit transactions. Check the vault status section on the trader's profile before attempting a deposit. There is no workaround — you must wait for the deposit window to reopen.
+</Note>

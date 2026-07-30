@@ -1,0 +1,67 @@
+---
+title: "Non-Custodial Vaults: How Investor Funds Stay Safe"
+sidebarTitle: "Non-Custodial"
+description: "Arcadia vaults are non-custodial by design. Investor USDC is held in a Solana smart contract — the trader can trade, but cannot withdraw your funds."
+---
+
+When you deposit USDC into an Arcadia vault, your funds never enter a trader's personal wallet. They are held in a program-derived address (PDA) — an on-chain account controlled exclusively by the Arcadia smart contract, not by any individual. The trader has been granted trading permissions by the protocol, not custody of your capital. This distinction is the foundation of trust in Arcadia: you are relying on auditable code to enforce the rules, not on a trader's promises.
+
+## What Non-Custodial Means in Practice
+
+In a traditional managed-account arrangement, a trader who controls your funds could, in principle, withdraw them. Arcadia's architecture eliminates that possibility at the protocol level.
+
+Your USDC is held in the vault's PDA — an address whose private key does not exist. Only the Arcadia program can authorize movements of funds out of that address, and the program only permits two types of outflows: withdrawals initiated by the investor who owns the corresponding shares, and trade executions that route capital through approved venues under the protocol's rules. There is no instruction in the program that allows a trader to transfer investor USDC to an arbitrary wallet.
+
+## What a Trader Can Do
+
+Within the vault, a trader has a defined and limited set of permissions:
+
+- **Open and close trading positions** within the protocol's leverage and position-size limits.
+- **Set the `deposits_open` flag** to control whether new investors can enter the vault.
+- **Call the `settle` instruction** to record performance above the high-water mark and receive their profit share — but only the profit share percentage, not investor principal.
+- **Pause or close the vault** to wind down operations in an orderly manner.
+
+Every one of these actions is executed through the vault program and emits a verifiable on-chain event.
+
+## What a Trader Cannot Do
+
+The smart contract enforces hard restrictions that cannot be overridden by anyone — including the trader, and including the Arcadia team:
+
+- **Cannot withdraw investor USDC.** There is no program instruction that transfers investor funds to the trader's personal wallet.
+- **Cannot override leverage limits.** The program rejects any trade instruction that would cause the vault to exceed the protocol's leverage cap.
+- **Cannot exceed the 20% AUM position limit.** No single trade can represent more than 20% of total vault assets under management. This prevents a trader from concentrating the entire vault into one position.
+- **Cannot exceed the capacity cap.** The vault cannot accept more investor capital than the trader's tier allows, protecting investors from undercapitalized vaults taking on excessive outside funds.
+- **Cannot block investor withdrawals.** Once the notice period passes, investors can always process their withdrawal regardless of what the trader does.
+
+## The Execution Wallet Mechanism
+
+The trader does not interact with the vault using their primary keypair. Instead, they use an **execution wallet** — an ephemeral keypair that has been granted a specific, limited set of trading permissions by the vault program. The execution wallet is funded only with the capital required to cover transaction fees and trade margin; it cannot initiate any instruction that moves investor USDC outside the vault's authorized flows.
+
+This separation means that even if an execution wallet keypair were compromised, an attacker could not use it to drain the vault. The program validates the type of instruction, not just the signer.
+
+## On-Chain Enforcement Points
+
+Every significant vault action produces an on-chain event that anyone can inspect:
+
+| Event | When It Is Emitted |
+|---|---|
+| `Deposited` | An investor deposits USDC and receives shares |
+| `WithdrawRequested` | An investor submits a withdrawal request |
+| `Withdrawn` | An investor's shares are burned and USDC is returned |
+| `TradeClosed` | A trading position is closed and PnL is recorded |
+| `Settled` | The vault NAV exceeds the HWM and profit share is calculated |
+| `ProfitWithdrawn` | The trader withdraws their earned profit share |
+
+You can verify any of these events independently using the Arcadia program ID:
+
+```
+FPoAMRkM3kXfuvFn1iC2cM8B554KfnaPjibjLH31CHtd
+```
+
+<Warning>
+Non-custodial means you are protected from theft — not from trading losses. If a trader opens losing positions, the vault's NAV per share falls and your shares lose value proportionally. The protocol prevents a trader from stealing your capital, but it does not insure against poor trading performance. Always review a trader's Arcadia Score and full history before depositing.
+</Warning>
+
+<Note>
+All vault activity is transparent and verifiable on-chain. Because every deposit, trade, settlement, and withdrawal is recorded as a program event on Solana, you can independently audit the complete history of any vault at any time — no permission required.
+</Note>

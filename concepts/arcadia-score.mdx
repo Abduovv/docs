@@ -1,0 +1,80 @@
+---
+title: "The Arcadia Score: Verified On-Chain Reputation"
+sidebarTitle: "Arcadia Score"
+description: "The Arcadia Score (0–1000) measures a trader's skill using time-weighted returns, risk-adjusted metrics, and trade history depth — all from on-chain data."
+---
+
+The Arcadia Score is a single number between 0 and 1000 that captures how well a trader manages risk and generates returns over time. It is computed entirely from on-chain trade data — no self-reporting, no manual verification, no room for manipulation. Investors use the score to evaluate traders before allocating capital, and the protocol uses it to determine which tier a trader belongs to, controlling how much external capital they can accept and what profit share they earn. A higher score means more capital access and better economics, which means the score creates a direct, ongoing incentive for disciplined trading.
+
+## How the Score Is Calculated
+
+The score is the product of three independent factors:
+
+**Score = Quality × Confidence × Guard Factor**, clamped between 0 and 1000.
+
+Each factor captures a different dimension of trader performance:
+
+- **Quality (Q)** measures *how well* you trade — a weighted composite of seven risk-adjusted metrics, scaled to a 0–100 range and multiplied by 10 to produce a 0–1000 raw signal.
+- **Confidence (C)** measures *how much data backs the signal* — a logistic function of your total trade count. A brand-new trader with zero trades starts at roughly 0.17, meaning even a perfect Quality score is heavily discounted. At 500 or more trades, Confidence approaches 0.92, giving experienced traders nearly full credit for their metrics.
+- **Guard Factor (G)** is a hard penalty applied when your trading shows signs of catastrophic risk. If either your liquidation rate exceeds 5% or your maximum drawdown exceeds 30%, G drops below 1.0, pulling your overall score down regardless of how good your other metrics look.
+
+All return calculations use **Time-Weighted Return (TWR)**, which strips out the effect of deposits and withdrawals so that your score reflects trading skill rather than capital flow timing.
+
+## Quality Metrics
+
+The Quality factor is a weighted average of seven metrics, each normalized relative to the population of Arcadia traders:
+
+| Metric | Weight | What It Measures |
+|---|---|---|
+| Sharpe Ratio | 25% | Risk-adjusted return relative to total volatility |
+| Sortino Ratio | 20% | Risk-adjusted return penalizing only downside volatility |
+| Max Drawdown (inverted) | 15% | Worst peak-to-trough loss — lower drawdown scores higher |
+| Calmar Ratio | 15% | Annualized return divided by maximum drawdown |
+| Volatility (inverted) | 10% | Return consistency — lower volatility scores higher |
+| Downside Deviation | 10% | Magnitude of returns that fall below a target threshold |
+| Mean Return | 5% | Average return per trade or period |
+
+The Sharpe and Sortino ratios together make up 45% of the Quality score, reflecting that risk-adjusted performance is the core signal. Raw mean return carries only 5% weight, so winning big on a few trades while taking excessive risk does not produce a high Quality score.
+
+## The Confidence Factor
+
+The Confidence factor exists because a small sample of trades can produce impressive-looking metrics by chance. A trader with 10 trades and a perfect Sharpe ratio has not proven anything statistically meaningful yet. Confidence grows as your on-chain trade history deepens:
+
+| Trade Count | Approximate Confidence |
+|---|---|
+| 0 trades | ~0.17 |
+| 50 trades | ~0.40 |
+| 150 trades | ~0.65 |
+| 300 trades | ~0.80 |
+| 500+ trades | ~0.92 |
+
+This means a new trader's score is intentionally conservative — a safeguard for investors allocating capital. As you accumulate a genuine track record, Confidence rises and your score more fully reflects your Quality metrics. There is no shortcut: you earn Confidence by trading.
+
+## The Guard Factor
+
+The Guard Factor acts as a circuit breaker for catastrophic risk profiles. Two conditions trigger it:
+
+- **Liquidation rate above 5%:** If more than 5% of your positions end in liquidation, the Guard Factor penalizes your score. Frequent liquidations signal that you are taking on more risk than your position sizing can support.
+- **Maximum drawdown above 30%:** If your portfolio has declined more than 30% from its peak at any point, the Guard Factor applies. Deep drawdowns damage investor capital and indicate insufficient downside protection.
+
+When either condition is met, G drops below 1.0, compressing your score even if your Quality and Confidence factors are strong. Avoid liquidations and keep drawdowns controlled — these are the minimum bars of risk discipline.
+
+## Score Range Reference
+
+| Score | What It Signals |
+|---|---|
+| 100–249 | New or early-stage trader; limited track record, entering the Verified tier |
+| 250–499 | Established track record with reasonable risk management; Established tier |
+| 500–749 | Consistent risk-adjusted performance across meaningful sample size; Advanced tier |
+| 750–949 | Strong long-run metrics with low drawdown and high confidence; Elite tier |
+| 950–1000 | Exceptional performance across every dimension; Apex tier |
+
+New traders receive a score floor of 100 — you enter the protocol at Verified tier rather than starting from zero. The ceiling of 1000 is a hard cap; no score can exceed it.
+
+<Note>
+The Arcadia Score updates hourly and is computed entirely from on-chain trade data. Because every trade, position, and liquidation event is recorded on-chain, the score cannot be manipulated through off-chain reporting or manual overrides.
+</Note>
+
+<Tip>
+Consistent risk management matters more than any single large win. Because Sharpe, Sortino, volatility, and drawdown together account for 70% of the Quality factor, a trader who posts steady, controlled returns will outscore a high-variance trader who occasionally hits big — and will hold that score as Confidence grows.
+</Tip>

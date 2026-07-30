@@ -1,0 +1,90 @@
+---
+title: "Arcadia Vaults: Smart-Contract Capital Pools"
+sidebarTitle: "Vaults"
+description: "Each Arcadia trader has one non-custodial vault on Solana. Investors deposit USDC, receive shares, and exit proportionally — with no direct trader access to funds."
+---
+
+Every trader on Arcadia operates through a single on-chain vault — a smart contract deployed on Solana that holds all capital, tracks performance, and enforces the rules of the protocol. The vault is the unit of trust between a trader and their investors: it records every deposit, trade settlement, and withdrawal in a verifiable, tamper-proof ledger. Investors do not send funds to a trader's wallet; they deposit into the vault contract, which issues shares in return. The trader never has direct access to investor USDC — they only hold trading permissions.
+
+## Vault Lifecycle
+
+<Steps>
+
+### Creation and Self-Funding
+A trader creates a vault by deploying it through the Arcadia program. Before accepting investor capital, the trader deposits their own USDC into the vault. This stake establishes the initial share supply and sets the starting NAV per share at 1.00 USDC. The trader's own capital is at risk alongside investors at all times.
+
+### Opening to Investors
+Once the trader is ready to accept external capital, they set `deposits_open` to true. Investors can now deposit USDC and receive vault shares priced at the current NAV per share. The trader can close deposits at any time by setting the flag to false — for example, when approaching their capacity cap or during volatile market conditions.
+
+### Active Trading
+With capital in the vault, the trader executes positions through their execution wallet. All trades are routed through the vault program, which enforces leverage limits, per-position size limits, and the overall capacity cap. The vault tracks the NAV per share in real time as positions open and close.
+
+### Settlement and Profit Distribution
+When the trader calls the `settle` instruction and the current NAV per share exceeds the high-water mark, a profit share is distributed. The trader receives their tier-based percentage of the new profits; the remaining amount stays credited to investor shares and the protocol takes its fee. The HWM updates to the new peak.
+
+### Investor Exits
+Investors who wish to exit submit a withdrawal request. After the required notice period passes, they call the process-withdrawal instruction, which burns their shares and returns the proportional USDC. The notice period protects the vault from sudden capital shocks that could force the trader to liquidate positions at bad prices.
+
+</Steps>
+
+## NAV Per Share
+
+NAV (Net Asset Value) per share is the price of a single vault share at any given moment. It starts at 1.00 USDC when the vault is first funded and changes as the vault's total value changes:
+
+- When trades generate profits, total vault value rises, and NAV per share rises proportionally.
+- When trades generate losses, total vault value falls, and NAV per share falls proportionally.
+- When investors deposit USDC, new shares are minted at the current NAV — they do not dilute existing holders.
+- When investors withdraw, their shares are burned at the current NAV and they receive the equivalent USDC.
+
+NAV per share is the single source of truth for vault performance. Investors who buy in at a NAV of 1.20 and exit at 1.44 have earned a 20% return on their entry, regardless of what other investors deposited or withdrew in between.
+
+## High-Water Mark
+
+The high-water mark (HWM) is the highest NAV per share the vault has ever reached. It exists to protect investors from being charged performance fees more than once for the same gains.
+
+Consider a vault where NAV reaches 1.50, then drops to 1.20, then recovers to 1.55. The trader earns a profit share only on the gain from 1.50 to 1.55 — the 0.05 USDC per share that represents genuinely new profit. The recovery from 1.20 back to 1.50 is not charged, because investors already experienced that loss and are only being made whole. This makes the HWM one of the strongest investor protections in the vault design.
+
+## Depositing into a Vault
+
+When you deposit USDC into an active vault with `deposits_open` set to true:
+
+1. The vault program calculates the current NAV per share.
+2. Your USDC is transferred into the vault's program-derived address (PDA).
+3. New vault shares are minted at the current NAV and credited to your wallet.
+4. A `Deposited` event is emitted on-chain recording the amount and share price.
+
+Your shares represent a proportional claim on the vault's total assets. If the vault is worth 100,000 USDC and you hold 10% of the shares, your position is worth 10,000 USDC at that moment.
+
+## Withdrawing from a Vault
+
+Withdrawals follow a two-step process to protect both the vault and other investors:
+
+1. **Request withdrawal:** You submit a withdrawal request specifying the number of shares you want to redeem. A `WithdrawRequested` event is emitted on-chain.
+2. **Process withdrawal:** After the notice period passes, you call the process-withdrawal instruction. Your shares are burned at the NAV per share at the time of processing, and you receive the equivalent USDC. A `Withdrawn` event is emitted.
+
+The notice period gives the trader time to manage position sizes in an orderly way rather than being forced into sudden liquidations to meet redemptions.
+
+## Vault Status
+
+Every vault has a status field that controls what actions are available:
+
+| Status | Meaning |
+|---|---|
+| `active` | The vault is operating normally. Deposits (if open), trading, settlement, and withdrawals are all available. |
+| `paused` | Trading and new deposits are suspended. Existing investors can still request and process withdrawals. Used during audits, unusual market conditions, or protocol upgrades. |
+| `closed` | The vault has wound down. No new deposits or trades are accepted. Investors can withdraw their remaining capital. |
+
+The `deposits_open` flag is separate from vault status — a vault can be `active` with `deposits_open` set to false if the trader has reached their capacity cap or wants to stop accepting new investors temporarily.
+
+<Note>
+The vault program enforces leverage limits and a per-position size limit of 20% of AUM per trade. These limits are not configurable by the trader — they are hard constraints in the smart contract that protect investors from the vault being overexposed to any single position.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Depositing as an Investor" icon="arrow-down-to-line" href="/investors/deposit">
+    Step-by-step guide to depositing USDC into an Arcadia vault and receiving shares.
+  </Card>
+  <Card title="Withdrawing Your Capital" icon="arrow-up-from-line" href="/investors/withdrawals">
+    How to request and process a withdrawal, including notice period details.
+  </Card>
+</CardGroup>

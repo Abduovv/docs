@@ -1,0 +1,70 @@
+---
+title: "Browse and Evaluate Traders on Arcadia"
+sidebarTitle: "Browse Traders"
+description: "Find traders worth backing by filtering the leaderboard by score, tier, return, and drawdown. Learn which metrics matter most for evaluating a trader."
+---
+
+The Arcadia leaderboard gives you a ranked, data-driven view of every verified trader on the platform. Before you allocate a single dollar, spend time here — not just glancing at recent returns, but examining the full picture: score confidence, drawdown history, vault capacity, and classification. Every metric you see is derived from on-chain activity and cannot be manually edited or inflated.
+
+## The Leaderboard
+
+The leaderboard offers two default sort views, each surfacing a different dimension of trader quality:
+
+- **Top 100 by Arcadia Score** — ranks traders by their overall risk-adjusted reputation score (0–1000). This view rewards consistency, discipline, and longevity over short-term luck.
+- **Top 100 by 30-Day Return** — ranks traders by recent performance. Useful for spotting momentum, but always cross-reference with drawdown and confidence before acting on it.
+
+You can filter and sort by tier, confidence level, style tags, and capacity availability. Use these filters to narrow the field before diving into individual profiles.
+
+## Key Metrics Explained
+
+Every trader card and profile exposes the same core metrics. Use this table as a reference when evaluating who to back:
+
+| Metric | What It Tells You |
+|---|---|
+| Arcadia Score | Overall risk-adjusted reputation (0–1000) |
+| Tier | Score bracket and capacity multiplier (Verified → Established → Advanced → Elite → Apex) |
+| Confidence | How much trading history backs the score (low / med / high) |
+| 30-Day Return | Recent performance over the last 30 days |
+| Max Drawdown | Worst peak-to-trough loss recorded on-chain |
+| Sortino Ratio | Downside-only risk-adjusted return — penalizes harmful volatility, not upside swings |
+| Capacity Used | What percentage of this vault's total allocation limit is already filled |
+
+Higher scores mean more proven skill, but always pair the score with its confidence level. A metric like Sortino ratio matters more at high confidence than at low confidence, because the sample size is large enough to be statistically meaningful.
+
+## The Trader Profile Page
+
+Clicking any trader in the leaderboard opens their full profile. Here you'll find:
+
+<CardGroup cols={2}>
+  <Card title="Equity Curve" icon="chart-line">
+    A visual chart of vault NAV per share over time. Look for steady upward slopes and shallow drawdowns rather than volatile spikes.
+  </Card>
+  <Card title="Trades Tab" icon="list">
+    The complete on-chain trade history: entry, exit, size, PnL per trade, and holding duration. Filter by date range or asset.
+  </Card>
+  <Card title="Score History" icon="clock-rotate-left">
+    How the Arcadia Score has trended over time. Improving scores signal a trader who is growing more consistent, not less.
+  </Card>
+  <Card title="Classification" icon="robot">
+    Whether the trader is classified as a human or an automated bot, based on on-chain behavioral analysis. Both can be legitimate — but know what you're backing.
+  </Card>
+</CardGroup>
+
+The profile also displays the vault's current status: NAV per share, total AUM, whether `deposits_open` is true or false, and remaining capacity.
+
+## Red Flags to Watch For
+
+Not every high-ranked trader is worth backing right now. Before depositing, check for these warning signs:
+
+- **Low confidence** — The score is based on too few trades to be reliable. A score of 912 backed by 20 trades carries far more uncertainty than an 800 score backed by 500+ trades.
+- **High max drawdown** — Any max drawdown above 20% signals the trader has taken (or accepted) significant losses in the past. That level of loss in your position would be difficult to recover from.
+- **`deposits_open = false`** — The vault is not currently accepting new investors. Attempting to deposit will fail. Check the vault status section on the profile page.
+- **Capacity near 100%** — Very little room remains for new capital. Even if deposits are technically open, the vault may be close to its allocation ceiling, which can affect future share availability.
+
+<Tip>
+  Filter for Confidence = **high** before evaluating scores. A 912 score with only 20 trades is far less reliable than an 800 score with 500+ trades — the latter has been tested across hundreds of market conditions.
+</Tip>
+
+<Note>
+  All metrics shown on Arcadia are derived from on-chain data. No trader can manually edit their score, return figures, or trade history. What you see is the verified, immutable record.
+</Note>

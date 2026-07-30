@@ -1,0 +1,73 @@
+---
+title: "Track Your Arcadia Investment Portfolio"
+sidebarTitle: "Portfolio"
+description: "The Arcadia portfolio dashboard shows your vault positions, current value, unrealized PnL, and ROI across every trader you've backed."
+---
+
+The Arcadia portfolio dashboard is your central view for everything you have deployed across the platform. It aggregates every active vault position into one place, so you can see your total exposure, how each position is performing, and whether any withdrawals are pending. All values update in real time as traders close positions and vault NAV per share changes.
+
+## Portfolio Overview
+
+At the top of the portfolio page, you'll see a summary row covering your full Arcadia exposure:
+
+- **Total deposited** — the sum of all USDC you originally deposited across every vault (your aggregate cost basis)
+- **Current value** — the sum of all your positions valued at their current NAV per share
+- **Overall PnL** — the difference between current value and total deposited, in USDC
+- **Overall ROI %** — your aggregate return expressed as a percentage of total deposited capital
+
+Below the summary, each vault position is displayed as its own card.
+
+## Per-Position Details
+
+Every vault position card shows the following information:
+
+<CardGroup cols={2}>
+  <Card title="Trader & Tier" icon="user">
+    The trader's handle and their current tier (Verified / Established / Advanced / Elite / Apex), so you know the reputation level of who's managing the vault.
+  </Card>
+  <Card title="Shares Held" icon="coins">
+    The exact number of vault shares you own in this position. Shares represent your fractional ownership of the vault's NAV.
+  </Card>
+  <Card title="Cost Basis" icon="receipt">
+    The total USDC you deposited into this vault. This is your baseline for calculating PnL — it does not change after the deposit is made.
+  </Card>
+  <Card title="Current Value" icon="arrow-trend-up">
+    Your shares multiplied by the vault's current NAV per share. This is the USDC value you would receive if you were to withdraw right now (before the notice period).
+  </Card>
+  <Card title="PnL & ROI" icon="percent">
+    Unrealized PnL in USDC (current value minus cost basis) and ROI % (PnL divided by cost basis). Both figures update continuously as the vault NAV moves.
+  </Card>
+  <Card title="Pending Withdrawal" icon="hourglass">
+    If you've submitted a withdrawal request, this shows the number of shares queued and the timestamp when the notice period ends and processing becomes available.
+  </Card>
+</CardGroup>
+
+## How Current Value Is Calculated
+
+Your current position value is straightforward:
+
+```
+Current Value = Shares Held × Current NAV per Share
+```
+
+NAV per share updates each time the trader closes a trade and the vault settles the result on-chain. Between settlements, the NAV figure shown is the most recently confirmed value. Open, unrealized positions held by the trader do not immediately change the vault NAV — only closed trades do.
+
+This means your displayed PnL may not capture the full picture of what the trader is currently holding. Use the trader's open positions tab (if available) and their equity curve for a more complete view.
+
+## Notifications
+
+Arcadia surfaces alerts for key events in your portfolio:
+
+- **Deposit confirmed** — your transaction settled and shares are live in your position
+- **Vault settled** — the trader closed trades and vault NAV updated, changing your position value
+- **Withdrawal ready** — the notice period on a pending withdrawal has elapsed and you can now process it to receive USDC
+
+Check your notification feed regularly, especially if you have pending withdrawals approaching their ready timestamp.
+
+<Note>
+  Unrealized PnL reflects the current vault NAV and fluctuates as the trader opens and closes positions. This number is not locked in until you complete a withdrawal. Realized PnL — the actual USDC you receive — is determined at the moment you process your withdrawal.
+</Note>
+
+<Tip>
+  Before adding more capital to a vault, open the trader's **score history chart** and check whether their Arcadia Score is trending upward, holding steady, or declining. A vault with strong recent returns but a falling score may be showing early signs of performance decay.
+</Tip>

@@ -1,0 +1,140 @@
+---
+title: "GET /v1/investors/:wallet/account"
+sidebarTitle: "Account"
+description: "GET /v1/investors/:wallet/account returns your investor account and all vault positions. Requires a valid Bearer JWT matching the wallet address."
+---
+
+The account endpoint is your primary view into your Arcadia investor state. It returns the on-chain account metadata tied to your wallet — including your account public key and creation timestamp — alongside a full list of every vault position you currently hold. Each position records your share balance, any pending withdrawal, and the cost basis used to calculate your realized and unrealized performance.
+
+## Request
+
+### Path Parameters
+
+<ParamField path="wallet" type="string" required>
+  The base58-encoded Solana wallet address of the investor. The JWT supplied in
+  the `Authorization` header must belong to this same wallet; requests where the
+  token and wallet do not match are rejected with `403 Forbidden`.
+</ParamField>
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  A valid Bearer JWT issued for the wallet address in the path. Format:
+  `Bearer <jwt>`.
+</ParamField>
+
+---
+
+## Response
+
+<ResponseField name="main" type="object" required>
+  Top-level account metadata stored on-chain for this investor.
+
+  <Expandable title="main fields">
+    <ResponseField name="wallet" type="string">
+      The base58 public key of the investor's Solana wallet.
+    </ResponseField>
+
+    <ResponseField name="account_pubkey" type="string">
+      The base58 public key of the investor's Arcadia account PDA (Program
+      Derived Address).
+    </ResponseField>
+
+    <ResponseField name="bump" type="number">
+      The canonical bump seed used to derive `account_pubkey`.
+    </ResponseField>
+
+    <ResponseField name="created_at" type="number">
+      Unix timestamp (seconds) when the investor account was first initialised
+      on-chain.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="positions" type="array">
+  An ordered list of every vault position the investor currently holds. An
+  empty array is returned if the investor has never deposited into a vault.
+
+  <Expandable title="InvestorPosition fields">
+    <ResponseField name="profile" type="string">
+      The base58 public key of the trader's vault profile PDA that this
+      position belongs to.
+    </ResponseField>
+
+    <ResponseField name="trader_handle" type="string">
+      The human-readable handle registered by the trader for this vault.
+    </ResponseField>
+
+    <ResponseField name="shares" type="number">
+      The number of vault shares currently held by the investor. Multiply by
+      the vault's `nav_per_share` to get the current USD value of this
+      position.
+    </ResponseField>
+
+    <ResponseField name="pending_withdraw_shares" type="number">
+      Shares locked in a pending withdrawal request that have not yet been
+      settled. These shares are no longer earning returns and cannot be
+      cancelled once submitted.
+    </ResponseField>
+
+    <ResponseField name="withdraw_ready_ts" type="number">
+      Unix timestamp (seconds) after which the pending withdrawal can be
+      executed. Returns `0` when there is no pending withdrawal for this
+      position.
+    </ResponseField>
+
+    <ResponseField name="cost_basis_usd" type="number">
+      Cumulative USD deposited into this position, adjusted for any prior
+      partial withdrawals. Used to compute PnL. Amounts are in USDC units
+      (raw on-chain value divided by 1,000,000).
+    </ResponseField>
+
+    <ResponseField name="bump" type="number">
+      The canonical bump seed used to derive this position's PDA.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+---
+
+## Example Request
+
+```bash
+curl -X GET "https://api.arcadia.trade/v1/investors/7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU/account" \
+  -H "Authorization: Bearer eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJ3YWxsZXQiOiI3eEtYdGcyQ1c4N2Q5N1RYSlNEcGJENWpCa2hlVHFBODNUWlJ1Sm9zZ0FzVSIsImlhdCI6MTcxNTAwMDAwMCwiZXhwIjoxNzE1MDg2NDAwfQ.SIGNATURE"
+```
+
+---
+
+## Example Response
+
+```json
+{
+  "main": {
+    "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+    "account_pubkey": "3FZbgi29cpjq2GjdwV8eyHuJJnkLtktZc5CC32GZidWJ",
+    "bump": 254,
+    "created_at": 1704067200
+  },
+  "positions": [
+    {
+      "profile": "BzHQpBRU5e2ZVPxq8dCRcHqMdVoP5kR7fLnW2aJtG4xY",
+      "trader_handle": "alpha_macro",
+      "shares": 1042.75,
+      "pending_withdraw_shares": 0,
+      "withdraw_ready_ts": 0,
+      "cost_basis_usd": 10000.00,
+      "bump": 253
+    },
+    {
+      "profile": "DkNpMvQaYcXrL8fThWsE6uJbZ3mPgC1yRo5HiKe7VABT",
+      "trader_handle": "vol_arb",
+      "shares": 580.20,
+      "pending_withdraw_shares": 200.00,
+      "withdraw_ready_ts": 1715692800,
+      "cost_basis_usd": 5500.00,
+      "bump": 251
+    }
+  ]
+}
+```

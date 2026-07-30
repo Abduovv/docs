@@ -1,0 +1,97 @@
+---
+title: "Get Started as a Trader on Arcadia"
+sidebarTitle: "Trader Quickstart"
+description: "Connect your Solana wallet, initialize your vault, and start building your Arcadia Score in four steps. Your on-chain history starts speaking for itself."
+---
+
+Your trading edge deserves capital to match it. Arcadia turns your on-chain history into a verified Arcadia Score — a tamper-proof, continuously updated reputation number that investors use to allocate real USDC into your vault. This guide walks you through everything you need to go from a fresh wallet connection to an active, investor-ready trader profile on Solana.
+
+<Note>
+  Arcadia is currently in **private beta**. You will need a waitlist invitation to create a trader profile. [Join the waitlist →](https://arcadia.trade)
+</Note>
+
+<Steps>
+  <Step title="Connect your wallet">
+    Arcadia uses **Sign-In With Solana (SIWS)** for authentication — no passwords, no email, no centralized accounts. Your wallet signature is your identity.
+
+    1. Navigate to [app.arcadia.trade](https://app.arcadia.trade) and click **Connect Wallet**.
+    2. Select **Phantom** or **Solflare** from the wallet picker.
+    3. Approve the connection request in your wallet extension.
+    4. Sign the SIWS authentication message when prompted — this is a free, off-chain signature that proves wallet ownership and issues you a session JWT.
+
+    <Tip>
+      The SIWS message includes a timestamp and domain. Never sign a SIWS message from a domain other than `app.arcadia.trade` — it cannot be replayed, but phishing sites may attempt to impersonate the app.
+    </Tip>
+
+    Once signed in, your wallet address becomes your persistent trader identity on Arcadia.
+  </Step>
+
+  <Step title="Initialize your trader profile">
+    Before any investor capital can enter your vault, you need to create your on-chain trader profile and seed your vault with your own funds.
+
+    1. From your dashboard, click **Initialize Vault**.
+    2. Review the vault creation transaction — this deploys your personal vault program account on Solana (Program ID: `FPoAMRkM3kXfuvFn1iC2cM8B554KfnaPjibjLH31CHtd` on devnet).
+    3. Approve the transaction in your wallet. A small SOL amount is required for account rent.
+    4. **Self-fund your vault** by depositing USDC into your own vault. This is a hard requirement before investor deposits are permitted.
+
+    <Note>
+      You must self-fund your vault before investors can allocate capital to you. This requirement aligns your interests with your investors — you have real skin in the game before they do.
+    </Note>
+
+    Your vault is initialized with `deposits_open = false`. You control when you open your vault to investors after you've established a score.
+  </Step>
+
+  <Step title="Start trading">
+    With your vault funded, you're ready to trade. Open the **Trading Terminal** from your dashboard to access all supported markets.
+
+    **Available markets:**
+    - Forex: XAU/USD, XAG/USD, EUR/USD, GBP/USD, USD/JPY
+    - Solana perpetual DEXs (supported venues listed in the terminal)
+
+    Every trade you execute — entry price, size, duration, exit, PnL — is recorded on-chain in real time. There is no off-chain shadow book. Your entire history is public, auditable, and feeds directly into your Arcadia Score calculation.
+
+    <Tip>
+      Consistency matters more than single large wins. The Arcadia Score weights risk-adjusted metrics like Sharpe and Sortino ratio heavily, so a steady, low-drawdown track record will outperform a volatile one over time.
+    </Tip>
+  </Step>
+
+  <Step title="Build your score and unlock investor capital">
+    Your Arcadia Score updates continuously as you trade. As your score crosses tier thresholds, your vault's investor capacity increases and your profit share rate rises.
+
+    Once you're satisfied with your score, open your vault to investors from the **Vault Settings** panel by toggling `deposits_open` to `true`. Investors browsing the leaderboard will now be able to allocate USDC to your vault.
+
+    Your profit share is automatically calculated on-chain at settlement — no manual claims or off-chain agreements required.
+  </Step>
+</Steps>
+
+## Trader Tiers
+
+Your Arcadia Score determines your tier, which in turn sets your **profit share rate** on investor returns and the maximum **investor capital** your vault can accept.
+
+| Score | Tier | Profit Share |
+|-------|------|:------------:|
+| 100+ | Verified | 20% |
+| 250+ | Established | 25% |
+| 500+ | Advanced | 30% |
+| 750+ | Elite | 35% |
+| 950+ | Apex | 40% |
+
+Scores below 100 are untiered. Your vault can still be self-funded and traded at any score, but investor deposits require a minimum Verified score (100+).
+
+<Tip>
+  Your tier is evaluated continuously — you can move up (or down) as your on-chain performance evolves. Focus on consistent, risk-adjusted returns to maintain and grow your tier.
+</Tip>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Initialize Your Vault" icon="vault" href="/traders/initialize-vault">
+    Step-by-step instructions for vault creation, self-funding, and configuring your deposit settings.
+  </Card>
+  <Card title="Trading Terminal" icon="terminal" href="/traders/trading-terminal">
+    Learn how to use the Arcadia trading interface, place orders, and manage open positions across all supported markets.
+  </Card>
+  <Card title="Arcadia Score" icon="star" href="/concepts/arcadia-score">
+    Understand every metric that feeds into your score, how weights are applied, and what you can do to improve it.
+  </Card>
+</CardGroup>

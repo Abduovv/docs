@@ -1,0 +1,116 @@
+---
+title: "GET /v1/traders/:handle/classification"
+sidebarTitle: "Classification"
+description: "GET /v1/traders/:handle/classification returns the bot/human verdict, trading style label, and wash-trading analysis for any trader on Arcadia."
+---
+
+The `/v1/traders/:handle/classification` endpoint returns Arcadia's automated integrity analysis for a given trader. It covers three distinct dimensions: whether the account appears to be operated by an automated bot or a human, what overall trading style pattern the on-chain activity most resembles, and whether there are statistical signals of wash trading. These classifications run continuously against on-chain trade data and are designed to help investors quickly surface manipulation risks or understand the nature of a strategy before allocating capital. No authentication is required to read classification data.
+
+## Request
+
+```
+GET https://api.arcadia.trade/v1/traders/:handle/classification
+```
+
+### Path Parameters
+
+<ParamField path="handle" type="string" required>
+  The trader's unique Arcadia handle. Handles are case-insensitive.
+</ParamField>
+
+## Response
+
+Returns a `TraderClassification` object with three top-level keys.
+
+<ResponseField name="bot" type="object" required>
+  Bot-vs-human verdict based on execution patterns, timing regularity, and on-chain behaviour.
+
+  <Expandable title="bot fields">
+    <ResponseField name="verdict" type="string" required>
+      Classification result. One of:
+      - `"human"` — activity is consistent with manual or discretionary trading.
+      - `"bot"` — activity strongly matches automated execution patterns.
+      - `"uncertain"` — insufficient data or mixed signals; no definitive classification can be made.
+    </ResponseField>
+    <ResponseField name="evidence" type="string[]" required>
+      Human-readable strings describing the specific signals that contributed to the verdict, e.g. `"Trade intervals show sub-second regularity"` or `"Entry times span multiple time zones inconsistently"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="profile" type="object" required>
+  Trading style label derived from cluster analysis of the trader's historical activity.
+
+  <Expandable title="profile fields">
+    <ResponseField name="label" type="string" required>
+      A short string naming the detected trading style, e.g. `"momentum-scalper"`, `"trend-follower"`, `"mean-reversion"`, or `"high-frequency-arb"`.
+    </ResponseField>
+    <ResponseField name="evidence" type="string[]" required>
+      Human-readable strings explaining why this label was assigned, referencing observable characteristics such as average holding time, leverage usage, or market concentration.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="wash" type="object" required>
+  Wash-trading analysis. Arcadia tests for patterns such as self-matched orders, suspiciously symmetric round-trips, and trades that generate fees without meaningful directional exposure.
+
+  <Expandable title="wash fields">
+    <ResponseField name="fired" type="number" required>
+      Number of individual wash-trading detection rules that triggered on this trader's history.
+    </ResponseField>
+    <ResponseField name="total" type="number" required>
+      Total number of wash-trading detection rules evaluated. Use `fired / total` to gauge severity.
+    </ResponseField>
+    <ResponseField name="evidence" type="string[]" required>
+      Human-readable strings describing which wash-trading patterns were detected, if any.
+    </ResponseField>
+    <ResponseField name="notes" type="string[]" required>
+      Additional context or caveats about the wash analysis, such as known false-positive conditions or mitigating factors observed in the data.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+### cURL
+
+```bash
+curl https://api.arcadia.trade/v1/traders/apex_trader/classification
+```
+
+### Response
+
+```json
+{
+  "bot": {
+    "verdict": "human",
+    "evidence": [
+      "Entry timestamps distributed across multiple sessions with natural variance",
+      "No sub-second order patterns detected",
+      "Position sizing shows manual rounding inconsistencies consistent with human input"
+    ]
+  },
+  "profile": {
+    "label": "momentum-trend-follower",
+    "evidence": [
+      "Average holding time of 5.2 hours is consistent with intraday trend capture",
+      "83% of trades entered following a directional breakout signal window",
+      "Strong market concentration in SOL-PERP and BTC-PERP",
+      "Leverage usage peaks during high-volatility sessions"
+    ]
+  },
+  "wash": {
+    "fired": 0,
+    "total": 12,
+    "evidence": [],
+    "notes": [
+      "No wash-trading patterns detected across 1,043 closed trades",
+      "Round-trip analysis shows no statistically anomalous fee-generating sequences"
+    ]
+  }
+}
+```
+
+<Note>
+  A `verdict` of `"uncertain"` does not mean the trader is likely a bot. It means Arcadia does not yet have enough on-chain data to make a reliable determination — typically fewer than 30 closed trades or a vault history shorter than 14 days. Check the `confidence` field on the trader's profile and revisit classification after the trader accumulates more history.
+</Note>

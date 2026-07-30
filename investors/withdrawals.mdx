@@ -1,0 +1,56 @@
+---
+title: "Withdraw Your Funds from an Arcadia Vault"
+sidebarTitle: "Withdrawals"
+description: "Request a withdrawal from an Arcadia vault, wait for the notice period, then process it to receive USDC proportional to current vault NAV."
+---
+
+Withdrawing from an Arcadia vault is a two-step process by design. You first submit a withdrawal request, which queues your shares as "pending." Then, after a notice period elapses, you return to process the withdrawal — at which point your shares are burned and USDC is transferred to your wallet. This structure protects the vault from bank-run dynamics: if all investors could exit instantly, a single wave of withdrawals could force a trader to liquidate open positions at unfavorable prices, harming everyone remaining in the vault.
+
+## How to Withdraw
+
+<Steps>
+  <Step title="Navigate to Portfolio and find your position">
+    Open your Arcadia portfolio dashboard. Locate the vault position you want to exit, either partially or in full.
+  </Step>
+  <Step title="Click Withdraw and enter the share amount">
+    Select the **Withdraw** button on the position card. Enter the number of shares you want to redeem. You can withdraw any portion of your shares — a full exit is not required. The interface will display the estimated USDC value based on the current NAV per share.
+  </Step>
+  <Step title="Sign the request_withdraw transaction">
+    Your wallet will prompt you to sign the `request_withdraw` transaction. Once confirmed on-chain, the specified shares move to **pending** status. They remain priced at current NAV but cannot be used for another withdrawal request while queued.
+  </Step>
+  <Step title="Wait for the notice period to elapse">
+    The vault enforces a notice period before withdrawals can be processed. Your position card will display the **withdraw_ready_ts** — the timestamp after which processing becomes available. You don't need to take any action during this window.
+  </Step>
+  <Step title="Click Process Withdrawal once the notice period passes">
+    When the notice period has elapsed, the **Process Withdrawal** button becomes active on your position card. Click it to initiate the final step.
+  </Step>
+  <Step title="Sign the process_withdraw transaction">
+    Approve the `process_withdraw` transaction in your wallet. The smart contract burns your pending shares and transfers USDC to your wallet based on the vault's NAV per share **at the time of processing**. The transaction confirms on Solana, and your position updates (or closes, if you withdrew all shares).
+  </Step>
+</Steps>
+
+## What You Receive
+
+The USDC amount you receive is calculated at the moment the `process_withdraw` transaction executes:
+
+```
+USDC Received = Pending Shares × NAV per Share (at time of processing)
+```
+
+This means the amount you receive depends on how the vault has performed between your request and your processing date — not on the NAV at the time you submitted the request.
+
+## Partial Withdrawals
+
+You don't have to exit a vault entirely. You can redeem any number of shares while leaving the rest invested. Your remaining shares continue to track the vault NAV normally. You can submit additional withdrawal requests for the remaining shares at any time.
+
+<Warning>
+  You receive USDC based on the vault NAV **at the time of processing**, not at the time of your withdrawal request. If the vault loses value during the notice period, you receive less USDC than estimated at request time. Conversely, if the vault gains value, you receive more. Plan your exit timing accordingly.
+</Warning>
+
+<Note>
+  The notice period exists to prevent bank-run dynamics that could destabilize an active vault and harm all investors — including those who remain. The exact length of the notice period is set by the platform and displayed on the vault's profile page.
+</Note>
+
+<Tip>
+  While your shares are pending withdrawal, you can still view the position's current value in your portfolio dashboard. Your pending shares are locked from further withdrawal requests but continue to be priced at the live NAV per share — so you can track exactly what you'll receive as the notice period counts down.
+</Tip>

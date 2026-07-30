@@ -1,0 +1,55 @@
+---
+title: "Trader Tiers: How Reputation Unlocks Capital"
+sidebarTitle: "Tiers"
+description: "Arcadia's five tiers — Verified through Apex — determine how much investor capital a trader can accept and what profit share they earn on performance."
+---
+
+Your Arcadia Score does not just measure performance — it directly controls your access to capital and your economics. As your score rises, you move through five tiers, each unlocking a higher capacity multiplier (more investor capital you can accept) and a higher profit share (a larger cut of the returns you generate above your high-water mark). Tiers create a compounding incentive: better risk-adjusted trading raises your score, which raises your tier, which puts more capital to work under your management and increases your share of the upside.
+
+## Tier Overview
+
+| Score Range | Tier | Capacity Multiplier | Profit Share |
+|---|---|---|---|
+| 100–249 | Verified | 1× | 20% |
+| 250–499 | Established | 2× | 25% |
+| 500–749 | Advanced | 3× | 30% |
+| 750–949 | Elite | 5× | 35% |
+| 950–1000 | Apex | 10× | 40% |
+
+## Capacity: How Much Capital You Can Accept
+
+Capacity defines the maximum amount of external investor USDC your vault can hold. It is calculated as:
+
+**Capacity = your vault shares × tier multiplier**
+
+Your vault shares represent the capital you have personally committed to your own vault — your skin in the game. The tier multiplier scales how much external capital you can accept on top of that. At the Verified tier, you can manage 1× your own stake in investor capital. By the time you reach Apex, you can manage 10× — meaning a trader who has committed 50,000 USDC of their own capital to their vault can accept up to 500,000 USDC from investors.
+
+This design ensures that traders always have meaningful personal exposure to the vault's performance, and that capital access scales with demonstrated skill rather than being granted upfront. As your score grows, your capacity ceiling rises automatically.
+
+## Profit Share: How You Earn From Performance
+
+Profit share is the percentage of new profits that a trader earns when the vault settles above its high-water mark (HWM). The HWM is the highest NAV per share the vault has ever recorded — it represents the previous peak that investors have already seen credited.
+
+When the trader calls the `settle` instruction and the current NAV per share exceeds the HWM:
+
+1. The profit above the HWM is calculated across all investor shares.
+2. That profit is split between the trader (the profit share percentage), investors (who retain the remaining percentage net of platform fees), and the protocol.
+3. The HWM is updated to the new peak.
+
+The HWM ensures traders only earn a profit share on *new* gains. If a vault loses ground and then recovers, the trader does not earn performance fees during the recovery — only once the vault surpasses its previous peak. This protects investors from being charged twice for the same performance.
+
+| Tier | Profit Share | Meaning |
+|---|---|---|
+| Verified | 20% | You keep 20 cents of every dollar of new profit above HWM |
+| Established | 25% | You keep 25 cents of every dollar of new profit above HWM |
+| Advanced | 30% | You keep 30 cents of every dollar of new profit above HWM |
+| Elite | 35% | You keep 35 cents of every dollar of new profit above HWM |
+| Apex | 40% | You keep 40 cents of every dollar of new profit above HWM |
+
+<Note>
+Tiers are assigned automatically by the protocol the moment your Arcadia Score crosses a threshold. No manual action, application, or approval is required. If your score drops back below a tier boundary, your tier adjusts downward on the next hourly score update.
+</Note>
+
+<Tip>
+If you are evaluating a trader as an investor, look at both the tier *and* where within the tier the score sits. A trader with a score of 749 is at the top of the Advanced tier and very close to Elite. A trader who just entered Elite at 750 has just crossed the threshold. Both are in different tiers, but the score context tells a more complete story about trajectory and consistency.
+</Tip>

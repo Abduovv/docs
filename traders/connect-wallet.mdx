@@ -1,0 +1,61 @@
+---
+title: "Connect Your Solana Wallet to Arcadia"
+sidebarTitle: "Connect Wallet"
+description: "Arcadia uses Sign-In With Solana (SIWS) for passwordless authentication. Connect Phantom or Solflare, sign a message, and your wallet becomes your identity."
+---
+
+Arcadia uses Sign-In With Solana (SIWS) to authenticate you without passwords, email addresses, or custodial accounts. Your Solana wallet is your identity — connecting it and signing a single off-chain message is all you need to access your dashboard, manage your vault, and track your Arcadia Score. Nothing is stored on Arcadia's servers that could be used to impersonate you.
+
+## Supported Wallets
+
+Arcadia officially supports **Phantom** and **Solflare**, the two most widely used Solana wallets. Other Solana wallets that implement the [Wallet Standard](https://github.com/wallet-standard/wallet-standard) (such as Backpack or Glow) may also work, but are not formally tested.
+
+<CardGroup cols={2}>
+  <Card title="Phantom" icon="ghost" href="https://phantom.app">
+    Available as a browser extension and mobile app. The most widely used Solana wallet.
+  </Card>
+  <Card title="Solflare" icon="sun" href="https://solflare.com">
+    Available as a browser extension and mobile app. Full Ledger hardware wallet support built in.
+  </Card>
+</CardGroup>
+
+## Connect Your Wallet
+
+<Steps>
+  <Step title="Visit the Arcadia app and click Connect Wallet">
+    Open the Arcadia app and click the **Connect Wallet** button in the top-right corner of the navigation bar.
+  </Step>
+  <Step title="Select your wallet">
+    Choose **Phantom** or **Solflare** from the wallet selector modal. If you are using a different Wallet Standard-compatible wallet, it may appear automatically.
+  </Step>
+  <Step title="Approve the connection request">
+    Your wallet extension or app will show a connection prompt asking for permission to share your public key with Arcadia. Click **Connect** (or **Approve**) to proceed. This step does not execute any transaction and costs no SOL.
+  </Step>
+  <Step title="Sign the authentication message">
+    After connecting, Arcadia immediately requests a signature on a plain-text SIWS message to verify that you control the wallet. Your wallet will display the message for review before you sign. Click **Sign** to complete authentication.
+  </Step>
+  <Step title="You're signed in">
+    Once the signature is verified, Arcadia issues a session JWT tied to your public key. Your wallet address is now your identity across every feature — dashboard, vault management, trading terminal, and payouts.
+  </Step>
+</Steps>
+
+## What You're Signing
+
+When Arcadia asks you to sign, the message follows the canonical SIWS format:
+
+```
+Arcadia wants you to sign in with your Solana account:
+{your_wallet_pubkey}
+
+Nonce: {nonce}
+```
+
+This is a **plain-text message signature**, not a transaction. No SOL is spent, no tokens are transferred, and nothing is written to the blockchain at this step. The nonce is a one-time random value that prevents replay attacks. You can read the full message in your wallet before signing.
+
+<Note>
+  Keep your wallet secure. Anyone who can sign with your wallet can act as you on Arcadia — including opening trades, withdrawing profit share, and modifying your vault. Never share your seed phrase or private key with anyone.
+</Note>
+
+<Tip>
+  If you are managing a vault with significant AUM, consider using a hardware wallet such as a **Ledger** with Solflare. Hardware wallets require physical confirmation for every signature, providing strong protection against remote compromise.
+</Tip>
