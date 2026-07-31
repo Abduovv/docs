@@ -9,7 +9,7 @@ Your Arcadia Score does not just measure performance — it directly controls yo
 ## Tier Overview
 
 | Score Range | Tier | Capacity Multiplier | Profit Share |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 100–249 | Verified | 1× | 20% |
 | 250–499 | Established | 2× | 25% |
 | 500–749 | Advanced | 3× | 30% |
@@ -33,13 +33,13 @@ Profit share is the percentage of new profits that a trader earns when the vault
 When the trader calls the `settle` instruction and the current NAV per share exceeds the HWM:
 
 1. The profit above the HWM is calculated across all investor shares.
-2. That profit is split between the trader (the profit share percentage), investors (who retain the remaining percentage net of platform fees), and the protocol.
+2. That profit is split three ways: the **trader profit share** (your tier's percentage), a small **platform fee** retained by the Arcadia protocol, and the **remainder**, which accrues to investors by increasing NAV per share.
 3. The HWM is updated to the new peak.
 
-The HWM ensures traders only earn a profit share on *new* gains. If a vault loses ground and then recovers, the trader does not earn performance fees during the recovery — only once the vault surpasses its previous peak. This protects investors from being charged twice for the same performance.
+The HWM ensures traders only earn a profit share on _new_ gains. If a vault loses ground and then recovers, the trader does not earn performance fees during the recovery — only once the vault surpasses its previous peak. This protects investors from being charged twice for the same performance.
 
 | Tier | Profit Share | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | Verified | 20% | You keep 20 cents of every dollar of new profit above HWM |
 | Established | 25% | You keep 25 cents of every dollar of new profit above HWM |
 | Advanced | 30% | You keep 30 cents of every dollar of new profit above HWM |
@@ -47,9 +47,9 @@ The HWM ensures traders only earn a profit share on *new* gains. If a vault lose
 | Apex | 40% | You keep 40 cents of every dollar of new profit above HWM |
 
 <Note>
-Tiers are assigned automatically by the protocol the moment your Arcadia Score crosses a threshold. No manual action, application, or approval is required. If your score drops back below a tier boundary, your tier adjusts downward on the next hourly score update.
+  Tiers are assigned automatically by the protocol the moment your Arcadia Score crosses a threshold. No manual action, application, or approval is required. If your score drops back below a tier boundary, your tier adjusts downward on the next hourly score update.
 </Note>
 
 <Tip>
-If you are evaluating a trader as an investor, look at both the tier *and* where within the tier the score sits. A trader with a score of 749 is at the top of the Advanced tier and very close to Elite. A trader who just entered Elite at 750 has just crossed the threshold. Both are in different tiers, but the score context tells a more complete story about trajectory and consistency.
+  If you are evaluating a trader as an investor, look at both the tier _and_ where within the tier the score sits. A trader with a score of 749 is at the top of the Advanced tier and very close to Elite. A trader who just entered Elite at 750 has just crossed the threshold. Both are in different tiers, but the score context tells a more complete story about trajectory and consistency.
 </Tip>
