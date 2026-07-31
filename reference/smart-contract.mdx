@@ -15,7 +15,7 @@ The Arcadia Vault program is a Solana smart contract that enforces all capital f
 ## Program ID
 
 | Network | Program ID |
-|---|---|
+| --- | --- |
 | Devnet | `FPoAMRkM3kXfuvFn1iC2cM8B554KfnaPjibjLH31CHtd` |
 | Mainnet | TBA |
 
@@ -26,7 +26,7 @@ The Arcadia Vault program is a Solana smart contract that enforces all capital f
 Arcadia stores all state in PDAs. You derive each account address deterministically from its seeds — no lookups required.
 
 | Account | Seeds | Description |
-|---|---|---|
+| --- | --- | --- |
 | `PlatformConfig` | `["platform"]` | Global protocol configuration — fees, parameters, admin keys. One account per deployment. |
 | `TraderProfile` | `["profile", trader_pubkey]` | One vault per trader. Stores AUM, share count, high-water mark, leverage limits, and vault status. |
 | `InvestorAccount` | `["investor", wallet_pubkey]` | One account per investor wallet. Tracks aggregate positions and investor metadata. |
@@ -37,7 +37,7 @@ Arcadia stores all state in PDAs. You derive each account address deterministica
 ## Key Instructions
 
 | Instruction | Who calls it | What it does |
-|---|---|---|
+| --- | --- | --- |
 | `initialize_profile` | Trader | Creates a new `TraderProfile` PDA and initialises the vault with the trader's configuration (leverage limit, capacity, minimum deposit). |
 | `deposit` | Investor or trader | Transfers USDC into the vault, mints shares proportional to the current NAV-per-share, and updates the investor's position. |
 | `request_withdraw` | Investor | Queues a withdrawal request. Records the number of shares to redeem and sets a `ready_ts` timestamp based on the vault's notice period. |
@@ -58,7 +58,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted when a trader creates a new vault by calling `initialize_profile`.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `profile` | `Pubkey` | The newly created `TraderProfile` PDA |
   | `trader` | `Pubkey` | The trader's wallet that owns the vault |
   | `score_tier` | `u8` | The trader's score tier at initialisation time |
@@ -69,7 +69,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted when an investor's `InvestorAccount` PDA is created for the first time.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `account` | `Pubkey` | The newly created `InvestorAccount` PDA |
   | `owner` | `Pubkey` | The investor's wallet |
 </Accordion>
@@ -78,7 +78,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted when an investor or trader successfully deposits USDC into a vault.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `profile` | `Pubkey` | The `TraderProfile` PDA of the vault that received the deposit |
   | `investor` | `Pubkey` | The wallet that made the deposit |
   | `amount` | `u64` | USDC deposited (in lamports, 6 decimals) |
@@ -90,7 +90,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted when an investor queues a withdrawal request. The investor must wait until `ready_ts` before processing.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `profile` | `Pubkey` | The vault the investor is withdrawing from |
   | `investor` | `Pubkey` | The wallet that submitted the request |
   | `shares` | `u64` | Number of shares queued for redemption |
@@ -101,7 +101,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted when a matured withdrawal request is successfully processed and USDC is returned to the investor.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `profile` | `Pubkey` | The vault the investor withdrew from |
   | `investor` | `Pubkey` | The wallet that received the USDC |
   | `usdc_out` | `u64` | USDC transferred to the investor (6 decimals) |
@@ -112,7 +112,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted when a trade is closed and its outcome is recorded on-chain. This is the primary input to the Arcadia Score.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `profile` | `Pubkey` | The vault whose trader closed the position |
   | `market` | `Pubkey` | The market or perp account the trade was on |
   | `direction` | `u8` | Trade direction (`0` = long, `1` = short) |
@@ -126,7 +126,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted at the end of a settlement period. Records the fee split between the trader and the protocol, and updates the vault's high-water mark.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `profile` | `Pubkey` | The vault that was settled |
   | `trader_fee` | `u64` | Performance fee credited to the trader |
   | `platform_fee` | `u64` | Management/performance fee credited to Arcadia |
@@ -137,7 +137,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted when a trader successfully withdraws their accrued performance fee.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `profile` | `Pubkey` | The vault from which profit was withdrawn |
   | `trader` | `Pubkey` | The trader's wallet that received the USDC |
   | `amount` | `u64` | USDC transferred to the trader (6 decimals) |
@@ -147,7 +147,7 @@ The program emits structured events that your indexer or UI can subscribe to via
   Emitted when an execution account is funded, enabling the trader's agent to submit trades on-chain.
 
   | Field | Type | Description |
-  |---|---|---|
+  | --- | --- | --- |
   | `profile` | `Pubkey` | The vault whose execution account was funded |
   | `trader` | `Pubkey` | The trader's wallet |
   | `amount` | `u64` | SOL amount funded (in lamports) |
@@ -160,7 +160,7 @@ The program emits structured events that your indexer or UI can subscribe to via
 When a transaction fails, the program returns one of the following custom errors. Surface these to users with the descriptions below.
 
 | Error | Meaning | How to handle |
-|---|---|---|
+| --- | --- | --- |
 | `Unauthorized` | The signer does not have permission to perform this action | Ensure the correct wallet is connected and that it is the vault owner for trader-only instructions. |
 | `VaultNotActive` | The vault is paused or closed | Inform the user the vault is not currently accepting activity. Check vault status before submitting. |
 | `ZeroAmount` | A deposit or withdrawal of 0 USDC was submitted | Validate that the amount is greater than zero before building the transaction. |
@@ -177,11 +177,19 @@ When a transaction fails, the program returns one of the following custom errors
 | `MathOverflow` | An arithmetic operation overflowed | This indicates an unexpected program state. Report the transaction signature to the Arcadia team. |
 | `TokenConservationFailed` | Post-instruction token balances do not satisfy conservation checks | This is a safety invariant violation. Report the transaction signature to the Arcadia team. |
 
+<Warning>
+  `MathOverflow` and `TokenConservationFailed` are **internal invariant violations**, not user-correctable errors. They indicate a bug or unexpected program state, and cannot be resolved by adjusting inputs or retrying. Surface a generic failure message to the user and report the transaction signature to the Arcadia team rather than prompting the user to retry.
+</Warning>
+
 ---
 
 ## TypeScript SDK Helpers
 
-The Arcadia TypeScript SDK (`arcadia-sdk`) exposes utilities for deriving and fetching on-chain accounts. Install it with your package manager, then use the helpers below.
+<Note>
+  **Coming soon.** The `arcadia-sdk` npm package is not yet published. The helpers below reflect the planned public API; expect breaking changes before the first stable release. In the meantime, derive PDAs and fetch account data directly with `@solana/web3.js` and `@coral-xyz/anchor` using the seeds and account layouts documented above.
+</Note>
+
+The Arcadia TypeScript SDK (`arcadia-sdk`) will expose utilities for deriving and fetching on-chain accounts. Once published, install it with your package manager, then use the helpers below.
 
 ### Derive PDA addresses
 

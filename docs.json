@@ -84,5 +84,8 @@
       "light": "#FFFFFF",
       "dark": "#060609"
     }
+  },
+  "thumbnails": {
+    "background": "/images/ChatGPTImageJul28,2026,03_48_19PM.png"
   }
 }
