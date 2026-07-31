@@ -1,9 +1,3 @@
----
-title: "Investor Account — GET /v1/investors/:wallet/account"
-sidebarTitle: "Account"
-description: "Retrieve your Arcadia investor account metadata and all current vault positions. Requires a Bearer JWT matching the wallet in the path."
----
-
 The account endpoint is your primary view into your Arcadia investor state. It returns the on-chain account metadata tied to your wallet — including your account public key and creation timestamp — alongside a full list of every vault position you currently hold. Each position records your share balance, any pending withdrawal, and the cost basis used to calculate your realized and unrealized performance.
 
 ## Request
@@ -11,16 +5,13 @@ The account endpoint is your primary view into your Arcadia investor state. It r
 ### Path Parameters
 
 <ParamField path="wallet" type="string" required>
-  The base58-encoded Solana wallet address of the investor. The JWT supplied in
-  the `Authorization` header must belong to this same wallet; requests where the
-  token and wallet do not match are rejected with `403 Forbidden`.
+  The base58-encoded Solana wallet address of the investor. The JWT supplied in the `Authorization` header must belong to this same wallet; requests where the token and wallet do not match are rejected with `403 Forbidden`.
 </ParamField>
 
 ### Headers
 
 <ParamField header="Authorization" type="string" required>
-  A valid Bearer JWT issued for the wallet address in the path. Format:
-  `Bearer <jwt>`.
+  A valid Bearer JWT issued for the wallet address in the path. Format: `Bearer <jwt>`.
 </ParamField>
 
 ---
@@ -36,8 +27,7 @@ The account endpoint is your primary view into your Arcadia investor state. It r
     </ResponseField>
 
     <ResponseField name="account_pubkey" type="string">
-      The base58 public key of the investor's Arcadia account PDA (Program
-      Derived Address).
+      The base58 public key of the investor's Arcadia account PDA (Program Derived Address).
     </ResponseField>
 
     <ResponseField name="bump" type="number">
@@ -45,20 +35,17 @@ The account endpoint is your primary view into your Arcadia investor state. It r
     </ResponseField>
 
     <ResponseField name="created_at" type="number">
-      Unix timestamp (seconds) when the investor account was first initialised
-      on-chain.
+      Unix timestamp (seconds) when the investor account was first initialised on-chain.
     </ResponseField>
   </Expandable>
 </ResponseField>
 
 <ResponseField name="positions" type="array">
-  An ordered list of every vault position the investor currently holds. An
-  empty array is returned if the investor has never deposited into a vault.
+  An ordered list of every vault position the investor currently holds. An empty array is returned if the investor has never deposited into a vault.
 
   <Expandable title="InvestorPosition fields">
     <ResponseField name="profile" type="string">
-      The base58 public key of the trader's vault profile PDA that this
-      position belongs to.
+      The base58 public key of the trader's vault profile PDA that this position belongs to.
     </ResponseField>
 
     <ResponseField name="trader_handle" type="string">
@@ -66,27 +53,19 @@ The account endpoint is your primary view into your Arcadia investor state. It r
     </ResponseField>
 
     <ResponseField name="shares" type="number">
-      The number of vault shares currently held by the investor. Multiply by
-      the vault's `nav_per_share` to get the current USD value of this
-      position.
+      The number of vault shares currently held by the investor, as a raw `u64` scaled by 1,000,000. Multiply by the vault's `nav_per_share` and divide by 1,000,000 to get the current USDC value of this position.
     </ResponseField>
 
     <ResponseField name="pending_withdraw_shares" type="number">
-      Shares locked in a pending withdrawal request that have not yet been
-      settled. These shares are no longer earning returns and cannot be
-      cancelled once submitted.
+      Shares locked in a pending withdrawal request that have not yet been settled, as a raw `u64` scaled by 1,000,000. These shares are no longer earning returns and cannot be cancelled once submitted.
     </ResponseField>
 
     <ResponseField name="withdraw_ready_ts" type="number">
-      Unix timestamp (seconds) after which the pending withdrawal can be
-      executed. Returns `0` when there is no pending withdrawal for this
-      position.
+      Unix timestamp (seconds) after which the pending withdrawal can be executed. Returns `0` when there is no pending withdrawal for this position.
     </ResponseField>
 
     <ResponseField name="cost_basis_usd" type="number">
-      Cumulative USD deposited into this position, adjusted for any prior
-      partial withdrawals. Used to compute PnL. Amounts are in USDC units
-      (raw on-chain value divided by 1,000,000).
+      Cumulative USDC deposited into this position, adjusted for any prior partial withdrawals. Used to compute PnL. Raw `u64` value scaled by 1,000,000 (divide by 1,000,000 for USDC).
     </ResponseField>
 
     <ResponseField name="bump" type="number">
@@ -120,21 +99,23 @@ curl -X GET "https://api.arcadia.trade/v1/investors/7xKXtg2CW87d97TXJSDpbD5jBkhe
     {
       "profile": "BzHQpBRU5e2ZVPxq8dCRcHqMdVoP5kR7fLnW2aJtG4xY",
       "trader_handle": "alpha_macro",
-      "shares": 1042.75,
+      "shares": 1042750000,
       "pending_withdraw_shares": 0,
       "withdraw_ready_ts": 0,
-      "cost_basis_usd": 10000.00,
+      "cost_basis_usd": 10000000000,
       "bump": 253
     },
     {
       "profile": "DkNpMvQaYcXrL8fThWsE6uJbZ3mPgC1yRo5HiKe7VABT",
       "trader_handle": "vol_arb",
-      "shares": 580.20,
-      "pending_withdraw_shares": 200.00,
+      "shares": 580200000,
+      "pending_withdraw_shares": 200000000,
       "withdraw_ready_ts": 1715692800,
-      "cost_basis_usd": 5500.00,
+      "cost_basis_usd": 5500000000,
       "bump": 251
     }
   ]
 }
 ```
+
+Share and USDC fields are raw `u64` values scaled by 1,000,000 — e.g. `shares: 1042750000` → `1042.75` shares; `cost_basis_usd: 10000000000` → `$10,000.00`.

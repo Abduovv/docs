@@ -1,20 +1,9 @@
----
-title: "Vault State — GET /v1/vaults/:profile Full Snapshot"
-sidebarTitle: "Vault State"
-description: "Retrieve a trader vault's current NAV per share, AUM, share supply, high-water mark, fee rates, and deposit status. No authentication required."
----
-
 The vault state endpoint exposes the complete on-chain snapshot of a single trader vault. You can use it to display live NAV, monitor assets under management, check whether deposits are currently open, inspect the fee structure, and verify the vault's Arcadia score tier — all without authentication. Poll this endpoint to power vault detail pages, capacity gauges, or automated deposit eligibility checks.
 
 <Note>
-  **NAV per share scaling:** `nav_per_share` is expressed in USDC units, meaning
-  the raw on-chain value has already been divided by 1,000,000. A value of
-  `11.25` means each vault share is currently worth $11.25 USDC.
+  **Numeric scaling:** All monetary fields (`nav_per_share`, `total_shares`, `aum`, `hwm`, `capacity_usd`, `trader_shares`, `trader_claimable`) are returned as raw `u64` fixed-point integers scaled by 1,000,000. Divide by 1,000,000 on the client to get the USDC or share value. For example, a `nav_per_share` of `11250000` means each vault share is currently worth \$11.25 USDC.
 
-  **Performance fee in basis points:** `perf_fee_bps` is expressed in basis
-  points where 100 bps = 1%. For example, a value of `1000` means a 10%
-  performance fee; `1500` means 15%. This fee is only charged on gains above
-  the high-water mark — it is never deducted from your principal.
+  **Performance fee in basis points:** `perf_fee_bps` is expressed in basis points where 100 bps = 1%. For example, a value of `1000` means a 10% performance fee; `1500` means 15%. This fee is only charged on gains above the high-water mark — it is never deducted from your principal.
 </Note>
 
 ## Request
@@ -22,9 +11,7 @@ The vault state endpoint exposes the complete on-chain snapshot of a single trad
 ### Path Parameters
 
 <ParamField path="profile" type="string" required>
-  The base58-encoded public key of the trader's vault profile PDA. You can
-  obtain this value from the leaderboard response or from the `profile` field
-  in any investor position.
+  The base58-encoded public key of the trader's vault profile PDA. You can obtain this value from the leaderboard response or from the `profile` field in any investor position.
 </ParamField>
 
 ---
@@ -32,77 +19,63 @@ The vault state endpoint exposes the complete on-chain snapshot of a single trad
 ## Response
 
 <ResponseField name="nav_per_share" type="number">
-  Current net asset value per share in USDC. Reflects the vault's total assets
-  divided by total outstanding shares after fees.
+  Current net asset value per share, as a raw `u64` fixed-point integer scaled by 1,000,000. Divide by 1,000,000 to get USDC.
 </ResponseField>
 
 <ResponseField name="total_shares" type="number">
-  Total number of shares outstanding across all investors and the trader
-  themselves.
+  Total number of shares outstanding across all investors and the trader themselves, as a raw `u64` scaled by 1,000,000.
 </ResponseField>
 
 <ResponseField name="aum" type="number">
-  Assets under management in USDC — the total USD value of all capital
-  currently deployed or held in the vault.
+  Assets under management, as a raw `u64` USDC value scaled by 1,000,000. The total USD value of all capital currently deployed or held in the vault.
 </ResponseField>
 
 <ResponseField name="hwm" type="number">
-  High-water mark NAV per share in USDC. Performance fees are only charged on
-  gains above this level, protecting investors from paying fees on recovered
-  losses.
+  High-water mark NAV per share, as a raw `u64` scaled by 1,000,000. Performance fees are only charged on gains above this level, protecting investors from paying fees on recovered losses.
 </ResponseField>
 
 <ResponseField name="status" type="string">
   Current operational status of the vault. One of:
+
   - `"active"` — vault is trading and accepting deposits (if `deposits_open` is `true`)
   - `"paused"` — trading is temporarily halted; no new deposits accepted
   - `"closed"` — vault has been wound down; withdrawals only
 </ResponseField>
 
 <ResponseField name="capacity_usd" type="number">
-  Maximum AUM the vault is configured to accept in USDC. Deposits that would
-  push AUM above this value are rejected.
+  Maximum AUM the vault is configured to accept, as a raw `u64` USDC value scaled by 1,000,000. Deposits that would push AUM above this value are rejected.
 </ResponseField>
 
 <ResponseField name="trader_shares" type="number">
-  The number of shares held by the trader themselves. Represents the trader's
-  own capital at risk ("skin in the game").
+  The number of shares held by the trader themselves, as a raw `u64` scaled by 1,000,000. Represents the trader's own capital at risk ("skin in the game").
 </ResponseField>
 
 <ResponseField name="deposits_open" type="boolean">
-  `true` if the vault is currently accepting new investor deposits. `false`
-  when the vault is at capacity, paused, or closed.
+  `true` if the vault is currently accepting new investor deposits. `false` when the vault is at capacity, paused, or closed.
 </ResponseField>
 
 <ResponseField name="trader_claimable" type="number">
-  Accumulated performance and management fees in USDC that the trader has
-  earned but not yet claimed from the vault.
+  Accumulated performance and management fees the trader has earned but not yet claimed from the vault, as a raw `u64` USDC value scaled by 1,000,000.
 </ResponseField>
 
 <ResponseField name="base_mint" type="string">
-  The base58 public key of the SPL token mint used as the vault's settlement
-  currency (USDC on mainnet).
+  The base58 public key of the SPL token mint used as the vault's settlement currency (USDC on mainnet).
 </ResponseField>
 
 <ResponseField name="vault_token" type="string">
-  The base58 public key of the vault's share token mint. Investors receive
-  these tokens as proof of their deposit.
+  The base58 public key of the vault's share token mint. Investors receive these tokens as proof of their deposit.
 </ResponseField>
 
 <ResponseField name="perf_fee_bps" type="number">
-  Performance fee rate in basis points (100 bps = 1%, e.g. `1000` = 10%).
-  Charged on profits above the high-water mark only.
+  Performance fee rate in basis points (100 bps = 1%, e.g. `1000` = 10%). Charged on profits above the high-water mark only.
 </ResponseField>
 
 <ResponseField name="mgmt_fee_bps" type="number">
-  Annual management fee rate in basis points. Accrues continuously and is
-  deducted from NAV regardless of performance.
+  Annual management fee rate in basis points. Accrues continuously and is deducted from NAV regardless of performance.
 </ResponseField>
 
 <ResponseField name="score_tier" type="string">
-  The Arcadia score tier assigned to this vault based on its verified
-  performance history. One of: `"Verified"`, `"Established"`, `"Advanced"`,
-  `"Elite"`, `"Apex"`.
+  The Arcadia score tier assigned to this vault based on its verified performance history. One of: `"Verified"`, `"Established"`, `"Advanced"`, `"Elite"`, `"Apex"`.
 </ResponseField>
 
 ---
@@ -119,15 +92,15 @@ curl -X GET "https://api.arcadia.trade/v1/vaults/BzHQpBRU5e2ZVPxq8dCRcHqMdVoP5kR
 
 ```json
 {
-  "nav_per_share": 11.207,
-  "total_shares": 8924.50,
-  "aum": 100032.47,
-  "hwm": 11.207,
+  "nav_per_share": 11207000,
+  "total_shares": 8924500000,
+  "aum": 100032470000,
+  "hwm": 11207000,
   "status": "active",
-  "capacity_usd": 500000.00,
-  "trader_shares": 1000.00,
+  "capacity_usd": 500000000000,
+  "trader_shares": 1000000000,
   "deposits_open": true,
-  "trader_claimable": 342.18,
+  "trader_claimable": 342180000,
   "base_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
   "vault_token": "GvFT9wQ8pZnEcx3PL2Xkm6DaJ5YbNhRuCfWoMsT1VpAd",
   "perf_fee_bps": 1500,
@@ -135,3 +108,5 @@ curl -X GET "https://api.arcadia.trade/v1/vaults/BzHQpBRU5e2ZVPxq8dCRcHqMdVoP5kR
   "score_tier": "Elite"
 }
 ```
+
+All monetary and share fields above are raw `u64` values scaled by 1,000,000. For display, divide by 1,000,000 — e.g. `nav_per_share: 11207000` → `$11.207` per share; `aum: 100032470000` → `$100,032.47`.
