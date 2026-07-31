@@ -12,6 +12,7 @@ Arcadia authenticates users through **Sign-In With Solana (SIWS)** — a passwor
   <Card title="Sign-In With Solana" icon="wallet">
     The primary method. Works with any Solana wallet (Phantom, Solflare, hardware wallets). No third-party dependency.
   </Card>
+
   <Card title="Privy" icon="key">
     For apps already using Privy's embedded wallets. Exchange your existing Privy token for an Arcadia JWT in one request.
   </Card>
@@ -45,16 +46,15 @@ The SIWS flow has four steps: request a nonce, sign a canonical message, verify 
       The nonce expires in **5 minutes**. Complete the sign-in flow quickly — if the nonce expires, request a new challenge before retrying.
     </Note>
   </Step>
-
   <Step title="Sign the canonical message">
     Construct the canonical sign-in message exactly as shown below and sign it with your wallet's ed25519 private key. Any deviation from this format will cause signature verification to fail.
 
     **Canonical message format**
 
-    ```
+    ```text
     Arcadia wants you to sign in with your Solana account:
     {pubkey}
-
+    
     Nonce: {nonce}
     ```
 
@@ -62,21 +62,20 @@ The SIWS flow has four steps: request a nonce, sign a canonical message, verify 
 
     **Example (filled in)**
 
-    ```
+    ```text
     Arcadia wants you to sign in with your Solana account:
     7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU
-
+    
     Nonce: 4xT9mR2kLqZ7vBpN
     ```
   </Step>
-
   <Step title="Verify the signature">
     Send the wallet address, your base58-encoded signature, and the nonce to `/v1/auth/verify`.
 
     ```http
     POST /v1/auth/verify
     Content-Type: application/json
-
+    
     {
       "wallet": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
       "signature": "5J7z...<base58-encoded signature>",
@@ -96,7 +95,6 @@ The SIWS flow has four steps: request a nonce, sign a canonical message, verify 
 
     The returned JWT expires after **24 hours**. Its `sub` claim is set to your base58 wallet public key.
   </Step>
-
   <Step title="Attach the JWT to API requests">
     Include the token in the `Authorization` header as a Bearer token on every authenticated request.
 
@@ -117,7 +115,7 @@ The following example performs the complete SIWS flow using `@solana/web3.js` an
 import { Connection, PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 
-const BASE_URL = "https://api.arcadia.trade";
+const BASE_URL = "https://api.arcadias.dev";
 
 /**
  * Performs the full SIWS flow and returns an Arcadia JWT.
@@ -210,7 +208,7 @@ x-api-key: <your-api-key>
 ## Token Expiry and Error Reference
 
 | Status Code | Meaning | What to do |
-|---|---|---|
+| --- | --- | --- |
 | `401 Unauthorized` | JWT is missing, expired, or malformed | Re-run the SIWS flow to get a fresh token |
 | `400 Bad Request` | Signature or nonce is invalid | Verify the canonical message format; request a new challenge |
 

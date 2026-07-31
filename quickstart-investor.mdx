@@ -7,25 +7,24 @@ description: "Browse verified traders by Arcadia Score, deposit USDC into a non-
 You don't need to take a trader's word for it. Arcadia gives every investor access to a tamper-proof, on-chain performance record for every trader on the platform — distilled into a single Arcadia Score and a full set of risk metrics. You allocate USDC through a non-custodial smart-contract vault, which means your funds are always held by code, never by the trader. This guide walks you through the full process from wallet connection to active investment.
 
 <Note>
-  Arcadia is currently in **private beta**. You will need a waitlist invitation to access the investor dashboard. [Join the waitlist →](https://arcadia.trade)
+  Arcadia is currently in **private beta**. You will need a waitlist invitation to access the investor dashboard. [Join the waitlist →](https://arcadias.dev/waitlist)
 </Note>
 
 <Steps>
   <Step title="Connect your wallet">
     Arcadia uses **Sign-In With Solana (SIWS)** for authentication — your Solana wallet is your account.
 
-    1. Navigate to [app.arcadia.trade](https://app.arcadia.trade) and click **Connect Wallet**.
+    1. Navigate to [arcadias.dev](https://arcadias.dev) and click **Connect Wallet**.
     2. Select **Phantom** or **Solflare** from the wallet picker.
     3. Approve the connection request in your wallet extension.
     4. Sign the SIWS authentication message when prompted. This is a free, off-chain signature that proves wallet ownership and issues you a session JWT.
 
     <Tip>
-      Only sign the SIWS message on `app.arcadia.trade`. The message includes a timestamp and domain binding — it cannot be reused, but always verify the domain in your wallet before signing.
+      Only sign the SIWS message on `arcadias.dev`. The message includes a timestamp and domain binding — it cannot be reused, but always verify the domain in your wallet before signing.
     </Tip>
 
     Make sure your wallet holds USDC on Solana before proceeding — that is the base asset for all Arcadia vaults.
   </Step>
-
   <Step title="Browse the trader leaderboard">
     From the **Discover** tab, you'll find the trader leaderboard ranked by Arcadia Score. Each row surfaces the most important metrics for evaluation:
 
@@ -38,7 +37,6 @@ You don't need to take a trader's word for it. Arcadia gives every investor acce
 
     Use the filters to narrow by tier, minimum score, maximum drawdown, or return threshold. Every metric shown is derived from on-chain data — nothing is self-reported.
   </Step>
-
   <Step title="Choose a trader and review their vault">
     Click any trader to open their full profile. Before depositing, review:
 
@@ -54,7 +52,6 @@ You don't need to take a trader's word for it. Arcadia gives every investor acce
 
     Take time to assess the trader's drawdown profile and consistency, not just their headline return. A lower maximum drawdown relative to returns often indicates more disciplined risk management.
   </Step>
-
   <Step title="Deposit USDC into the vault">
     When you're ready to invest:
 
@@ -69,7 +66,6 @@ You don't need to take a trader's word for it. Arcadia gives every investor acce
       Arcadia's non-custodial vault architecture protects you from theft — the trader cannot withdraw your USDC. However, it does **not** protect you from trading losses. If the trader loses money on positions, your share of the vault NAV will decline accordingly. Only invest capital you can afford to lose, and diversify across multiple traders.
     </Warning>
   </Step>
-
   <Step title="Track your portfolio">
     After depositing, your **Portfolio** dashboard shows your full investment picture in real time:
 
@@ -89,9 +85,11 @@ You don't need to take a trader's word for it. Arcadia gives every investor acce
   <Card title="Browse Traders" icon="magnifying-glass" href="/investors/browse-traders">
     Learn how to filter, sort, and evaluate traders on the Arcadia leaderboard to find the right fit for your risk profile.
   </Card>
+
   <Card title="Deposit into a Vault" icon="arrow-down-to-bracket" href="/investors/deposit">
     A detailed walkthrough of the deposit flow, transaction structure, and what to expect after your USDC enters a vault.
   </Card>
+
   <Card title="How Vaults Work" icon="vault" href="/concepts/vaults">
     Understand the non-custodial vault architecture, custody boundaries, settlement mechanics, and withdrawal process.
   </Card>
