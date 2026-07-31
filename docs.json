@@ -1,12 +1,15 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "luma",
-  "name": "Arcadia",
-  "favicon": "https://media.brand.dev/d8489e5e-7e00-4446-a122-d9353df623a4.png",
+  "name": "Arcadia Protocol",
+  "favicon": {
+    "light": "https://media.brand.dev/d8489e5e-7e00-4446-a122-d9353df623a4.png",
+    "dark": "/images/arcadia_logo.png"
+  },
   "colors": {
-    "primary": "#7c7496",
-    "light": "#21203c",
-    "dark": "#efeff0"
+    "primary": "#E6E6E6",
+    "light": "#E6E6E6",
+    "dark": "#060609"
   },
   "navbar": {
     "primary": {
@@ -64,50 +67,22 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "api/overview",
-              "api/authentication"
-            ]
-          },
-          {
-            "group": "Traders",
-            "pages": [
-              "api/traders/list",
-              "api/traders/profile",
-              "api/traders/score-history",
-              "api/traders/classification"
-            ]
-          },
-          {
-            "group": "Investors",
-            "pages": [
-              "api/investors/account",
-              "api/investors/portfolio",
-              "api/investors/flows"
-            ]
-          },
-          {
-            "group": "Vaults & Markets",
-            "pages": [
-              "api/vaults/vault",
-              "api/vaults/trades",
-              "api/leaderboard",
-              "api/prices"
-            ]
-          }
-        ]
       }
     ]
   },
   "footer": {
     "socials": {
       "x": "https://x.com/arcadia_trade"
+    }
+  },
+  "logo": {
+    "light": "/images/arcadia_logo-removebg-preview.png",
+    "dark": "/images/arcadia_logo-removebg-preview.png"
+  },
+  "background": {
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#060609"
     }
   }
 }

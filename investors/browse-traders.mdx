@@ -4,23 +4,31 @@ sidebarTitle: "Browse Traders"
 description: "Find traders worth backing by filtering the leaderboard by score, tier, return, and drawdown. Learn which metrics matter most before you deposit."
 ---
 
-The Arcadia leaderboard gives you a ranked, data-driven view of every verified trader on the platform. Before you allocate a single dollar, spend time here — not just glancing at recent returns, but examining the full picture: score confidence, drawdown history, vault capacity, and classification. Every metric you see is derived from on-chain activity and cannot be manually edited or inflated.
+The Arcadia **Traders Marketplace** is where you discover every verified trader on the platform. You are not limited to the leaderboard: the marketplace lets you filter and sort the full roster of traders by the criteria that matter to you, so you can find the ones that fit your strategy, risk tolerance, and capacity needs. Every metric you see is derived from on-chain activity and cannot be manually edited or inflated.
 
-## The Leaderboard
+## The Traders Marketplace
 
-The leaderboard offers two default sort views, each surfacing a different dimension of trader quality:
+The marketplace is the primary place to discover traders. You can browse the full list and apply filters and sorts to narrow the field to exactly what you're looking for.
 
-- **Top 100 by Arcadia Score** — ranks traders by their overall risk-adjusted reputation score (0–1000). This view rewards consistency, discipline, and longevity over short-term luck.
-- **Top 100 by 30-Day Return** — ranks traders by recent performance. Useful for spotting momentum, but always cross-reference with drawdown and confidence before acting on it.
+Common filters and sorts include:
 
-You can filter and sort by tier, confidence level, style tags, and capacity availability. Use these filters to narrow the field before diving into individual profiles.
+- **Arcadia Score** — filter by score range or sort by overall risk-adjusted reputation (0–1000).
+- **Tier** — Verified, Established, Advanced, Elite, or Apex.
+- **Confidence level** — low, medium, or high, based on how much trading history backs the score.
+- **Return window** — 7-day, 30-day, 90-day, or all-time return.
+- **Max drawdown** — cap the worst peak-to-trough loss you're willing to accept.
+- **Style tags** — trend-following, scalping, delta-neutral, and other trading styles.
+- **Capacity availability** — vaults that still have room for new deposits.
+- **Classification** — human or automated bot.
+
+The leaderboard (Top 100 by Arcadia Score and Top 100 by 30-Day Return) is one useful view into the marketplace, but discovery is not limited to it. Use the marketplace filters directly to build the shortlist that matches what you want to back.
 
 ## Key Metrics Explained
 
 Every trader card and profile exposes the same core metrics. Use this table as a reference when evaluating who to back:
 
 | Metric | What It Tells You |
-|---|---|
+| --- | --- |
 | Arcadia Score | Overall risk-adjusted reputation (0–1000) |
 | Tier | Score bracket and capacity multiplier (Verified → Established → Advanced → Elite → Apex) |
 | Confidence | How much trading history backs the score (low / med / high) |
@@ -41,18 +49,21 @@ Higher scores mean more proven skill, but always pair the score with its confide
 
 ## The Trader Profile Page
 
-Clicking any trader in the leaderboard opens their full profile. Here you'll find:
+Clicking any trader in the marketplace opens their full profile. Here you'll find:
 
 <CardGroup cols={2}>
   <Card title="Equity Curve" icon="chart-line">
     A visual chart of vault NAV per share over time. Look for steady upward slopes and shallow drawdowns rather than volatile spikes.
   </Card>
+
   <Card title="Trades Tab" icon="list">
     The complete on-chain trade history: entry, exit, size, PnL per trade, and holding duration. Filter by date range or asset.
   </Card>
+
   <Card title="Score History" icon="clock-rotate-left">
     How the Arcadia Score has trended over time. Improving scores signal a trader who is growing more consistent, not less.
   </Card>
+
   <Card title="Classification" icon="robot">
     Whether the trader is classified as a human or an automated bot, based on on-chain behavioral analysis. Both can be legitimate — but know what you're backing.
   </Card>
@@ -64,13 +75,13 @@ The profile also displays the vault's current status: NAV per share, total AUM, 
 
 Not every high-ranked trader is worth backing right now. Before depositing, check for these warning signs:
 
-- **Low confidence** — The score is based on too few trades to be reliable. A score of 912 backed by 20 trades carries far more uncertainty than an 800 score backed by 500+ trades.
+- **Low confidence** — The score is based on too few trades to be reliable. A score of 912 backed by 20 trades carries far more uncertainty than an 800 score backed by 500\+ trades.
 - **High max drawdown** — Any max drawdown above 20% signals the trader has taken (or accepted) significant losses in the past. That level of loss in your position would be difficult to recover from.
 - **`deposits_open = false`** — The vault is not currently accepting new investors. Attempting to deposit will fail. Check the vault status section on the profile page.
 - **Capacity near 100%** — Very little room remains for new capital. Even if deposits are technically open, the vault may be close to its allocation ceiling, which can affect future share availability.
 
 <Tip>
-  Filter for Confidence = **high** before evaluating scores. A 912 score with only 20 trades is far less reliable than an 800 score with 500+ trades — the latter has been tested across hundreds of market conditions.
+  Filter for Confidence = **high** before evaluating scores. A 912 score with only 20 trades is far less reliable than an 800 score with 500\+ trades — the latter has been tested across hundreds of market conditions.
 </Tip>
 
 <Note>
